@@ -1,0 +1,254 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.header {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.contact-info {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.95em;
+    color: #666;
+}
+
+.contact-info a {
+    color: #2980b9;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.contact-info a:hover {
+    color: #3498db;
+}
+
+.section {
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s;
+}
+
+.section:hover {
+    transform: translateY(-5px);
+}
+
+h2 {
+    color: #2c3e50;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 5px;
+    text-decoration: underline; /* Added underline */
+    text-decoration-color: #3498db; /* Matches original blue line color */
+    text-underline-offset: 0.3em; /* we don't want the underline to be too close */
+}
+
+.entry {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.entry:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+h3 {
+    color: #34495e;
+    font-size: 1.3em;
+    margin-bottom: 8px;
+}
+
+.date {
+    color: #7f8c8d;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    display: block;
+}
+
+ul {
+    list-style: none;
+    margin-left: 20px;
+}
+
+ul li {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+ul li::before {
+    content: '•';
+    color: #3498db;
+    position: absolute;
+    left: -15px;
+}
+
+.skills-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.skills-legend {
+    display: flex;
+    gap: 15px;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-item.proficient .legend-color {
+    background: #2ecc71; /* Green for Proficient */
+}
+
+.legend-item.experienced .legend-color {
+    background: #fccc09; /* Yellow for Experienced */
+}
+
+.legend-item.familiar .legend-color {
+    background: #fd9515; /* Red for Familiar */
+}
+
+.skills-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.skill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-tag {
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 800;
+    transition: transform 0.2s;
+}
+
+.skill-tag:hover {
+    transform: scale(1.05);
+}
+
+/* Proficiency Levels */
+.skill-proficient {
+    background: #2ecc71; /* Green for Proficient */
+}
+
+.skill-experienced {
+    background: #fccc09; /* Yellow for Experienced */
+}
+
+.skill-familiar {
+    background: #fd9515; /* Red for Familiar */
+}
+
+
+
+/* -------------------------- RESPONSIVE MEDIA ------------------------------------- */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px auto; /* Reduced margin for smaller screens */
+        padding: 0 15px;
+    }
+
+    .header {
+        padding: 20px; /* Reduced padding */
+    }
+
+    h1 {
+        font-size: 2em; /* Smaller heading */
+    }
+
+    .contact-info {
+        flex-direction: column; /* Stack contact info vertically */
+        gap: 10px;
+    }
+
+    .section {
+        padding: 20px; /* Reduced padding */
+    }
+
+    h2 {
+        font-size: 1.5em; /* Smaller section headers */
+    }
+
+    h3 {
+        font-size: 1.2em; /* Smaller entry headers */
+    }
+
+    .skills-header {
+        flex-direction: column; /* Stack heading and legend */
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .skills-legend {
+        gap: 10px; /* Reduced gap for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8em; /* Even smaller heading */
+    }
+
+    .skill-tag {
+        font-size: 0.85em; /* Slightly smaller skill tags */
+        padding: 5px 10px;
+    }
+
+    .skills-legend {
+        font-size: 0.9em; /* Slightly smaller legend */
+    }
+}
