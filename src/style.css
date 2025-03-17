@@ -193,7 +193,21 @@ ul li::before {
     background: #fd9515; /* Red for Familiar */
 }
 
+/* -------------------------- COUNTER ---------------------------------------------- */
+.visitor-counter {
+    text-align: center;
+}
 
+.visitor-counter p {
+    font-size: 1.2em;
+    color: #34495e;
+    margin-top: 10px;
+}
+
+.visitor-counter #visitor-count {
+    font-weight: bold;
+    color: #3498db;
+}
 
 /* -------------------------- RESPONSIVE MEDIA ------------------------------------- */
 @media (max-width: 768px) {
@@ -236,6 +250,10 @@ ul li::before {
     .skills-legend {
         gap: 10px; /* Reduced gap for smaller screens */
     }
+
+    .visitor-counter p {
+        font-size: 1.1em; /* Adjusted for smaller screens */
+    }
 }
 
 @media (max-width: 480px) {
@@ -250,5 +268,9 @@ ul li::before {
 
     .skills-legend {
         font-size: 0.9em; /* Slightly smaller legend */
+    }
+
+    .visitor-counter p {
+        font-size: 1em; 
     }
 }
