@@ -133,3 +133,84 @@ Because only someone with access to your DNS settings can add this record, its p
 ## Step 6 - Create a DynamoDB
 
 [Here](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/getting-started-step-1.html)
+
+[DynamoDB structure](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html?icmpid=docs_dynamodb_help_panel_hp_table#HowItWorks.CoreComponents.TablesItemsAttributes)
+
+We can NOT simply use "Count" as the primary key because:
+
+If `Count` is the primary key, you need to know the exact value of `Count` to fetch it (e.g., `Count` = 0). However, for a visitor counter, you want to increment a count, not fetch a static key. Using `Count` as the primary key doesn’t make sense for this use case because:
+You can’t easily update a primary key (you’d need to delete and re-insert the item).
+You likely want a single item with a fixed key and an attribute that increments (e.g., `Count` as an attribute, not the key).
+
+**Solution**: Redesign the table to have a fixed primary key (e.g., `ID` as a String) and store the counter as an attribute (e.g., `Count` as a Number). Then use `GetItem` or `UpdateItem` to fetch/increment it.
+
+
+Something like this:
+
+```bash
+aws dynamodb create-table --table-name VisitorCounter \ 
+    --attribute-definitions AttributeName=ID,AttributeType=S \ 
+    --key-schema AttributeName=ID,KeyType=HASH \ 
+    --billing-mode PAY_PER_REQUEST \ 
+    --table-class STANDARD
+```
+
+Then:
+```bash
+aws dynamodb put-item --table-name VisitorCounter \
+    --item '{"ID": {"S": "visitor"}, "Count": {"N": "0"}}'
+```
+
+Then code up the GetCount() and IncrementCount() using the AWS SDK for Go v2.
+
+
+## Set up Lambda
+
+We will setup the backend for the visitor counter first, then test it with `cURL`, then add frontend Typescript to communicate with the backend.
+
+[Tutorial](https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway-tutorial.html)
+
+### Substep 1 - Create a policy for Lambda to interact with DynamoDB.
+
+### Substep 2 - Create an execution role for Lambda to interact with DynamoDB.
+
+Use the same policy created in Substep 1.
+
+Choose **Lambda** for *use case*. Add the policy created in Substep 1.
+
+Then to integrate it with AWS API Gateway, see [CLI version](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integration-using-cli.html) and [console version](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-create-api-as-simple-proxy-for-lambda.html).
+
+Proxy integration: we handle the HTTP request with headers, and we have to specify the response format as well.
+Custom integration: The headers are abstracted, we only need to specify the mapping from the HTTP request's input data into what our Lambda wants to see. But this involves more setup. In this project, we used Proxy Integration.
+
+
+### Substep 3 - Create the Lambda function
+
+```
+GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o bootstrap main.go
+zip myFunction.zip bootstrap
+```
+
+## Setup API Gateway
+
+### Substep 1 - Create the `/api` resource on API Gateway
+The `/api` prefix groups your endpoints, which is useful if you plan to add more API endpoints later (e.g., `/api/stats`, `/api/resetCount`). It keeps your API distinct from other potential resources (e.g., `/web`, `/admin`).
+
+Convention: Many REST APIs use `/api` as a standard prefix to indicate an API endpoint, improving readability and aligning with common practices.
+
+### Substep 2 - Create the `/getCount` and `/incrementCount` resource on API Gateway
+
+- Choose the Lambda Integration option.
+- Enable the CORS option.
+- Enable Proxy Integration.
+- Choose our Lambda function.
+
+The `OPTIONS` resoruce lets browswer find out about CORS permissions: 
+Browsers send an `OPTIONS` preflight request for `POST /putCount` (and potentially `GET /getCount` if headers change) to check CORS permissions. Your Lambda sets CORS headers (`Access-Control-Allow-Origin`: *), but API Gateway needs `OPTIONS` methods to respond to preflights.
+
+I edited the methods allowed in CORS to only `GET, POST, OPTIONS` since we only need `GET` for `getCount` and `POST` for `incrementCount`
+
+
+
+
+
