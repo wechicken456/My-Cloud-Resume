@@ -1,5 +1,8 @@
 # Cloud Resume
 
+You can access my resume [here](https://www.pwnph0fun.com).
+
+
 ## Project structure
 
 ```
