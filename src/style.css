@@ -194,19 +194,32 @@ ul li::before {
 }
 
 /* -------------------------- COUNTER ---------------------------------------------- */
-.visitor-counter {
+#visitor-counter-board {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
     text-align: center;
+    font-family: Arial, sans-serif;
 }
 
-.visitor-counter p {
-    font-size: 1.2em;
-    color: #34495e;
-    margin-top: 10px;
+#visitor-counter-board h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
 }
 
-.visitor-counter #visitor-count {
+#visitor-counter-board #visitor-count {
+    display: block;
+    font-size: 18px;
     font-weight: bold;
-    color: #3498db;
+    color: #007bff;
+    margin-top: 5px;
 }
 
 /* -------------------------- RESPONSIVE MEDIA ------------------------------------- */

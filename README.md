@@ -1,6 +1,6 @@
 # Cloud Resume
 
-You can access my resume [here](https://www.pwnph0fun.com).
+You can access my domain and resume [here](https://www.pwnph0fun.com).
 
 
 ## Project structure
@@ -46,7 +46,13 @@ Some important configs to look for when creating the bucket:
 
 Then upload all the files in the production folder `dist/` to the bucket from the terminal:
 ```bash
-aws s3 cp ./dist s3://tin-cloud-resume/ --recursive
+aws s3 cp ./dist s3://pwnph0fun-cloud-resume/ --recursive
+```
+
+Then every time we change the front end, 
+Remember to **Invalidate** the CDN cache:
+```
+aws cloudfront create-invalidation --distribution-id <your-cloudfront-id> --paths "/*"
 ```
 
 ## Step 3 - Create Origin Access Identity
@@ -77,6 +83,10 @@ Some important configs to look for when creating the distribution:
 - Price class: only North America and Europe.
 - Leave Web Application Firewall (WAF) as Do not enable (unless you need it).
 
+Remember to **Invalidate** the CDN cache every time we change the **front end**:
+```
+aws cloudfront create-invalidation --distribution-id <your-cloudfront-id> --paths "/*"
+```
 
 ## Step 5 - Register a custom domain with Route53
 
@@ -167,7 +177,7 @@ aws dynamodb put-item --table-name VisitorCounter \
 Then code up the GetCount() and IncrementCount() using the AWS SDK for Go v2.
 
 
-## Set up Lambda
+## Step 7 - Set up Lambda
 
 We will setup the backend for the visitor counter first, then test it with `cURL`, then add frontend Typescript to communicate with the backend.
 
@@ -194,7 +204,7 @@ GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o bootstrap main.go
 zip myFunction.zip bootstrap
 ```
 
-## Setup API Gateway
+## Step 8 - Setup API Gateway
 
 ### Substep 1 - Create the `/api` resource on API Gateway
 The `/api` prefix groups your endpoints, which is useful if you plan to add more API endpoints later (e.g., `/api/stats`, `/api/resetCount`). It keeps your API distinct from other potential resources (e.g., `/web`, `/admin`).
@@ -213,6 +223,14 @@ Browsers send an `OPTIONS` preflight request for `POST /putCount` (and potential
 
 I edited the methods allowed in CORS to only `GET, POST, OPTIONS` since we only need `GET` for `getCount` and `POST` for `incrementCount`
 
+
+## Step 9 - Create Front-End code to fetch the APIs
+
+See `main.ts`
+
+Fetch once on DOM load, then fetch again every 5 seconds.
+
+Use `localStorage` to maintain per browser increment: don't increment on reloads within the same browser.
 
 
 

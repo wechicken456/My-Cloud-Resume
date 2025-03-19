@@ -3,7 +3,54 @@ import { resumeData } from './data';
 
 document.addEventListener('DOMContentLoaded', () => {
     const app = document.getElementById('app') as HTMLElement;
+    // Visitor Counter
+    const counterBoard = document.createElement("div");
+    counterBoard.id = "visitor-counter-board";
+    counterBoard.innerHTML = `
+        <h3>Visitors</h3>
+        <span id="visitor-count">Loading...</span>
+    `;
+    document.body.append(counterBoard);
 
+    const baseURL = 'https://raf6u1lwte.execute-api.us-east-2.amazonaws.com/test/api';
+    const visitorCountElement = document.getElementById('visitor-count') as HTMLElement;
+
+    // check if this client has visited before (per-browser tracking)
+    const hasVisited = localStorage.getItem("hasVisited");
+    const fetchCount = () => {
+        fetch(`${baseURL}/getCount`, {
+            method: 'GET',
+            mode: 'cors',
+        })
+        .then(response => response.json())
+        .then(data => {
+            visitorCountElement.textContent = data.count.toString();
+        })
+        .catch(error => {
+            console.log("Error incrementing count: ", error);
+            visitorCountElement.textContent = 'Error...';
+        })
+    }
+    fetchCount();    // fetch the visitor count when the page first loaded
+    setInterval(fetchCount, 10000) // then fetch every 10 second to stay up-to-date
+
+    // fetch initial count in the background
+    if (!hasVisited) {
+        fetch(`${baseURL}/incrementCount`, {
+            method: 'POST',
+            mode: 'cors',
+        })
+        .then(response => response.json())
+        .then(data => {
+            visitorCountElement.textContent = data.count.toString();
+            localStorage.setItem('hasVisited', 'true');     // Mark as visisted if it's this browser's first time visting.
+        })
+        .catch(error => {
+            console.log("Error incrementing count: ", error);
+            visitorCountElement.textContent = 'Error...';
+        })
+    }     
+    
     // Header
     const header = document.createElement('header');
     header.className = 'header';

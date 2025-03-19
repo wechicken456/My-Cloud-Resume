@@ -72,13 +72,14 @@ func (tb *TableBasics) IncrementCount() (int, error) {
 	updateInput := dynamodb.UpdateItemInput{
 		TableName:                 &tb.TableName,
 		Key:                       map[string]types.AttributeValue{"ID": &types.AttributeValueMemberS{Value: "visitor"}}, // Value is the name of the ID that we set for the counter in DynamoDB
-		UpdateExpression:          aws.String("SET count = count + :val"),
+		UpdateExpression:          aws.String("SET #C = #C + :val"),
+		ExpressionAttributeNames:  map[string]string{"#C": "Count"},
 		ExpressionAttributeValues: map[string]types.AttributeValue{":val": &types.AttributeValueMemberN{Value: "1"}},
 		ReturnValues:              types.ReturnValueUpdatedNew, // Returns only the updated attributes, as they appear after theUpdateItem operation
 	}
 	result, err := tb.DynamoDBClient.UpdateItem(context.Background(), &updateInput)
 	if err != nil {
-		return 0, fmt.Errorf("failed to increment count: %v", err)
+		return 0, fmt.Errorf("failed to increment Count: %v", err)
 	}
 
 	var newCount int
