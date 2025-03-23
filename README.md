@@ -233,7 +233,7 @@ Fetch once on DOM load, then fetch again every 5 seconds.
 Use `localStorage` to maintain per browser increment: don't increment on reloads within the same browser.
 
 
-### Step 10 - Unit testing?
+## Step 10 - Unit testing?
 
 [Is it necessary?](https://www.reddit.com/r/golang/comments/zo80b7/comment/j0n3y77/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 
@@ -247,6 +247,84 @@ Now, ask yourself another thing before writing that same test: if my implementat
 
 
 ***I did it anyway*** using the mock tests. 
+
+
+## Step 11 - CI/CD
+
+Used Github Actions for this.
+
+First, set up AWS secrets by going to the repo's **Settings -> Actions -> Secrets and variables**.
+
+Then, using [backend.yml](.github/workflows/backend.yml) as an example:
+```yaml
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/backend/**'
+      - '.github/workflows/backend.yml'
+
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'src/backend/**'
+      - '.github/workflows/backend.yml'
+    if: github.event.pull_request.head.repo.full_name == github.repository
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./src/backend
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go 
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22.2
+      
+      - name: Install dependencies
+        run: go mod tidy      
+      - name: Build
+        run: GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o bootstrap main.go
+      - name: Run tests
+        run: go test -race -v *.go 
+        if: always()
+      - name: Zip for Lambda
+        run: zip -j bootstrap.zip bootstrap
+      - name: Deploy to AWS Lambda
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run:
+          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --zip-file fileb://bootstrap.zip
+```
+
+`on`: what event to respond to
+
+- `push`: what to do on a **push** on the **master** branch that **changes** files in `src/backend/**`.
+- similarly for `pull_request`.
+
+`jobs`: what to run.
+
+- `runs-on`: platform.
+- `defaults` -> `working-directory`: where to run the following commands.
+- `steps`:
+    - `uses`: what external actions to use.
+    - `name`: name of the current step
+    - `run`: what CLI (Bash) command to run
+    - `if`: only run this command if condition met.
+
+
 
 
 
