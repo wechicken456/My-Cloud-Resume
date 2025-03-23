@@ -15,6 +15,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 )
 
+// DynamoDBAPI defines the interface for DynamoDB operations
+// This makes testing easier by allowing mock implementations
+type DynamoDBAPI interface {
+	GetItem(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error)
+	UpdateItem(ctx context.Context, params *dynamodb.UpdateItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error)
+}
+
 type VisitorCount struct {
 	ID    string `dynamodbav:"ID"`
 	Count int    `dynamodbav:"Count"`
@@ -26,7 +33,7 @@ type APIResponse struct {
 }
 
 type TableBasics struct {
-	DynamoDBClient *dynamodb.Client
+	DynamoDBClient DynamoDBAPI // Changed from *dynamodb.Client to DynamoDBAPI interface
 	TableName      string
 }
 

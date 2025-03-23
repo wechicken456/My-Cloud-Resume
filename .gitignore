@@ -24,6 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 
-
-src/server/myFunction.zip
-src/server/boostrap
+.env
+src/backend/bootstrap.zip
+src/backend/boostrap

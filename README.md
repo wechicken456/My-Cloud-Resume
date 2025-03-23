@@ -233,5 +233,20 @@ Fetch once on DOM load, then fetch again every 5 seconds.
 Use `localStorage` to maintain per browser increment: don't increment on reloads within the same browser.
 
 
+### Step 10 - Unit testing?
+
+[Is it necessary?](https://www.reddit.com/r/golang/comments/zo80b7/comment/j0n3y77/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+
+Ask yourself one thing before writing any unit tests: what is this layer responsible for? The REST API layer is responsible for validating input, calling some service and then returning a response (perhaps mapped to a DTO) with an appropriate status code.
+
+Appropriate status codes & input validation are easily tested via table tests. Testing DTO mapping is valuable but also has a huge cost associated with it because it essentially creates a implementation specific dependency between your tests and your API layer. Every time you update/create/delete a field in the response, you have to update that in the test.
+
+The other problem with testing the API layer is that you have to make all your tests implementation aware. Want to check that that you return a 404 if a resource is missing? You have to mock the service/db/whatever call to return a not-found error or a nil or something similar. This makes it super hard to write good API tests, and you usually end up with something that's just a copy of your handler written as a unit test with mock calls instead of actual calls.
+
+Now, ask yourself another thing before writing that same test: if my implementation changes, do I have to update the unit test? If the answer is yes, then the unit test might not be as valuable as you think.
+
+
+***I did it anyway*** using the mock tests. 
+
 
 
