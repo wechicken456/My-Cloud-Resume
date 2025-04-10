@@ -80,10 +80,18 @@ export const resumeData: ResumeData = {
     projects: [
         {
             name: "Physics-informed Machine Learning Model",
-            date: "March 2025",
+            date: "March 2025 - Current",
             details: [
                 "Developing a physics-informed machine learning model using the transformer architecture in PyTorch for aviation engine failure prediction.", 
                 "Processed real-time synthetic flight data from XPlane SDK, applying feature scaling for model training."
+            ]
+        },
+        {
+            name: "Cloud Resume",
+            date: "March 2025",
+            details:[
+                "Designed and deployed a cloud-hosted resume website using AWS services, including S3 for static hosting, CloudFront for CDN distribution, Route 53 for custom domain management (pwnph0fun.com), and ACM for SSL certification.",
+                "Developed a serverless visitor counter with DynamoDB, Go-based Lambda, and API Gateway, integrated with a TypeScript frontend, featuring automated CI/CD pipelines via GitHub Actions and unit testing with Go mocks."       
             ]
         },
         {
