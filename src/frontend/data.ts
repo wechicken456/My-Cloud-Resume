@@ -87,7 +87,7 @@ export const resumeData: ResumeData = {
             ]
         },
         {
-            name: "Cloud Resume",
+            name: "AWS Cloud Resume",
             date: "March 2025",
             details:[
                 "Designed and deployed a cloud-hosted resume website using AWS services, including S3 for static hosting, CloudFront for CDN distribution, Route 53 for custom domain management (pwnph0fun.com), and ACM for SSL certification.",
