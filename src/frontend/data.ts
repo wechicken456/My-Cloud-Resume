@@ -30,7 +30,7 @@ export interface ResumeData {
         roles: string[];
         details: string[];
     };
-    skills: Array<{name : string, proficiency: string}>;
+    skills: Array<{ name: string, proficiency: string }>;
 }
 
 export const resumeData: ResumeData = {
@@ -46,7 +46,7 @@ export const resumeData: ResumeData = {
         degree: "Bachelor of Science in Advanced Computing (Honors Tutorial College)",
         location: "Athens, OH",
         details: [
-            "As a student in the Honors Tutorial College, I benefit from a distinctive academic experience: personalized, one-on-one tutorials with professors, allowing me to explore subjects of my choosing in depth.",            
+            "As a student in the Honors Tutorial College, I benefit from a distinctive academic experience: personalized, one-on-one tutorials with professors, allowing me to explore subjects of my choosing in depth.",
             "My past tutorials focused on Post-Quantum Cryptography and Linux Kernel Security.",
             "Current tutorial focuses on developing a physics-informed machine learning model using the transformer architecture in PyTorch for aviation engine failure prediction.",
             "Notable coursework: Database Systems, Parallel Computing, Operating Systems, Software Security.",
@@ -79,19 +79,28 @@ export const resumeData: ResumeData = {
     ],
     projects: [
         {
-            name: "Physics-informed Machine Learning Model",
+            name: "Microservices-based Banking App in Golang",
+            date: "April 2025 - Present",
+            details: [
+                "Architected a Golang-based Banking Application utilizing a microservices architecture with the Controller-Service-Repository design pattern, facilitating inter-service communication with gRPC, and containerizing microservices and databases with Docker.",
+                "Engineered PostgreSQL database solutions for backend services, ensuring ACID transactional integrity for financial operations, managing migrations with goose, and generating type-safe SQL queries with SQLC.",
+                "Developed secure JWT-based authentication at the JSON-based RESTful API Gateway, incorporating refresh tokens and fingerprinting adhering to OWASP principles.",
+            ]
+        },
+        {
+            name: "Aviation Engine Failure Detection Model",
             date: "March 2025 - Current",
             details: [
-                "Developing a physics-informed machine learning model using the transformer architecture in PyTorch for aviation engine failure prediction.", 
-                "Processed real-time synthetic flight data from XPlane SDK, applying feature scaling for model training."
+                "Developed a LSTM model in PyTorch for aviation engine failure prediction.",
+                "Automated synthetic flights using the XPlane SDK to record and process data for model training.",
             ]
         },
         {
             name: "AWS Cloud Resume",
             date: "March 2025",
-            details:[
+            details: [
                 "Designed and deployed a cloud-hosted resume website using AWS services, including S3 for static hosting, CloudFront for CDN distribution, Route 53 for custom domain management (pwnph0fun.com), and ACM for SSL certification.",
-                "Developed a serverless visitor counter with DynamoDB, Go-based Lambda, and API Gateway, integrated with a TypeScript frontend, featuring automated CI/CD pipelines via GitHub Actions and unit testing with Go mocks."       
+                "Developed a serverless visitor counter with DynamoDB, Go-based Lambda, and API Gateway, integrated with a TypeScript frontend, featuring automated CI/CD pipelines via GitHub Actions and unit testing with Go mocks."
             ]
         },
         {
@@ -169,6 +178,12 @@ export const resumeData: ResumeData = {
         ]
     },
     skills: [
+        { name: "gRPC", proficiency: "proficient" },
+        { name: "Huggingface", proficiency: "experienced" },
+        { name: "Ollama", proficiency: "experienced" },
+        { name: "Supabase", proficiency: "experienced" },
+        { name: "n8n", proficiency: "experienced" },
+        { name: "Github Actions CI/CD", proficiency: "experienced" },
         { name: "Golang", proficiency: "proficient" },
         { name: "C", proficiency: "proficient" },
         { name: "C++", proficiency: "experienced" },
@@ -194,7 +209,7 @@ export const resumeData: ResumeData = {
         { name: "Cryptography", proficiency: "proficient" },
         { name: "TypeScript", proficiency: "experienced" },
         { name: "Vite", proficiency: "experienced" },
-        { name: "gRPC", proficiency: "experienced"},
+        { name: "gRPC", proficiency: "experienced" },
         { name: "x86 Assembly", proficiency: "experienced" },
-    ] 
+    ]
 };
