@@ -7,18 +7,18 @@ import (
 )
 
 type LikesService struct {
-	storage *storage.Storage
+	storage storage.StorageInterface
 }
 
-func NewLikesService(storage *storage.Storage) *LikesService {
+func NewLikesService(storage storage.StorageInterface) *LikesService {
 	return &LikesService{storage: storage}
 }
 
 func (ls *LikesService) GetLikeCount(ctx context.Context) (int, error) {
-	return ls.storage.GetCount("likes")
+	return ls.storage.GetCount(ctx, "likes")
 }
 
-// Increments/Decrements the like count and toggles the user's like status
+// returns the updated likes count, the updated like status for this user, the string representing the action taken, and any error encountered
 func (ls *LikesService) ToggleLike(ctx context.Context, sessionID string) (int, bool, string, error) {
 	// Check current like status
 	session, err := ls.storage.GetUserSession(ctx, sessionID)
@@ -39,11 +39,11 @@ func (ls *LikesService) ToggleLike(ctx context.Context, sessionID string) (int, 
 	var action string
 
 	if session.HasLiked {
-		count, err = ls.storage.DecrementCount("likes")
+		count, err = ls.storage.DecrementCount(ctx, "likes")
 		action = "unliked"
 		session.HasLiked = false
 	} else {
-		count, err = ls.storage.IncrementCount("likes")
+		count, err = ls.storage.IncrementCount(ctx, "likes")
 		action = "liked"
 		session.HasLiked = true
 	}

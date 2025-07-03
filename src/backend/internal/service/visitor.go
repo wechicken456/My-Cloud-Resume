@@ -6,19 +6,20 @@ import (
 	"main/internal/storage"
 )
 
-type CounterService struct {
-	storage *storage.Storage
+type VisitorService struct {
+	storage storage.StorageInterface
 }
 
-func NewCounterService(storage *storage.Storage) *CounterService {
-	return &CounterService{storage: storage}
+func NewVisitorService(storage storage.StorageInterface) *VisitorService {
+	return &VisitorService{storage: storage}
 }
 
-func (cs *CounterService) GetVisitorCount(ctx context.Context) (int, error) {
-	return cs.storage.GetCount("visitor")
+func (cs *VisitorService) GetVisitorCount(ctx context.Context) (int, error) {
+	return cs.storage.GetCount(ctx, "visitor")
 }
 
-func (cs *CounterService) IncrementVisitorCount(ctx context.Context, sessionID string) (int, bool, string, error) {
+// returns the updated visitor count, whether the user has visited before, the string representing the action taken, and any error encountered
+func (cs *VisitorService) IncrementVisitorCount(ctx context.Context, sessionID string) (int, bool, string, error) {
 	// Check if user has already visited
 	session, err := cs.storage.GetUserSession(ctx, sessionID)
 	if err != nil {
@@ -31,17 +32,17 @@ func (cs *CounterService) IncrementVisitorCount(ctx context.Context, sessionID s
 		if err != nil {
 			return 0, false, "", err
 		}
-		session = &model.UserSession{SessionID: sessionID, HasVisited: false}
+		session = &model.UserSession{SessionID: sessionID, HasVisited: false, HasLiked: false}
 	}
 
 	if session.HasVisited {
 		// User already visited, just return current count
-		count, err := cs.storage.GetCount("visitor")
+		count, err := cs.storage.GetCount(ctx, "visitor")
 		return count, false, "already_counted", err
 	}
 
 	// Increment count and mark as visited
-	count, err := cs.storage.IncrementCount("visitor")
+	count, err := cs.storage.IncrementCount(ctx, "visitor")
 	if err != nil {
 		return 0, false, "", err
 	}
@@ -55,7 +56,7 @@ func (cs *CounterService) IncrementVisitorCount(ctx context.Context, sessionID s
 	return count, true, "incremented", nil
 }
 
-func (cs *CounterService) GetSessionStatus(ctx context.Context, sessionID string) (*model.UserSession, error) {
+func (cs *VisitorService) GetSessionStatus(ctx context.Context, sessionID string) (*model.UserSession, error) {
 	session, err := cs.storage.GetUserSession(ctx, sessionID)
 	if err != nil {
 		return nil, err
