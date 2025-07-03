@@ -25,5 +25,4 @@ dist-ssr
 *.sw?
 
 .env
-src/backend/bootstrap.zip
-src/backend/boostrap
+**/bootstrap*

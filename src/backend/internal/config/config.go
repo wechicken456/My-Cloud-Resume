@@ -1,0 +1,37 @@
+package config
+
+import (
+	"os"
+)
+
+type Config struct {
+	DynamoDBTable           string
+	SessionTable            string
+	RecaptchaSecretKey      string
+	SESRegion               string
+	NotificationDstEmail    string
+	NotificationSrcEmail    string
+	NotificationPhoneNumber string
+	Environment             string
+}
+
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+func Load() *Config {
+	return &Config{
+		DynamoDBTable:        getEnv("DYNAMODB_TABLE", "Counters"),
+		SessionTable:         getEnv("SESSION_TABLE", "UserSessions"),
+		RecaptchaSecretKey:   getEnv("RECAPTCHA_SECRET_KEY", ""),
+		SESRegion:            getEnv("SES_REGION", "us-east-1"),
+		NotificationDstEmail: getEnv("NOTIFICATION_DST_EMAIL", "tinvuong2003@gmail.com"),
+		NotificationSrcEmail: getEnv("NOTIFICATION_SRC_EMAIL", "tuztheultimatezed@gmail.com"),
+
+		NotificationPhoneNumber: getEnv("NOTIFICATION_DST_PHONE", "5139148401"),
+		Environment:             getEnv("ENVIRONMENT", "dev"),
+	}
+}

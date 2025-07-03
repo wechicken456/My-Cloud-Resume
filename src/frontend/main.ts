@@ -1,56 +1,23 @@
 import './style.css';
 import { resumeData } from './data';
+import { api } from './api/api';
+import { setupLikesCounter } from './components/Likes';
+import { setupContactForm } from './components/Contact';
+import { setupVisitorCounter } from './components/Counter';
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const app = document.getElementById('app') as HTMLElement;
+
     // Visitor Counter
-    const counterBoard = document.createElement("div");
-    counterBoard.id = "visitor-counter-board";
-    counterBoard.innerHTML = `
-        <h3>Visitors</h3>
-        <span id="visitor-count">Loading...</span>
-    `;
-    document.body.append(counterBoard);
+    setupVisitorCounter(document.body);
 
-    const baseURL = 'https://raf6u1lwte.execute-api.us-east-2.amazonaws.com/test/api';
-    const visitorCountElement = document.getElementById('visitor-count') as HTMLElement;
+    // Likes Counter
+    setupLikesCounter(document.body);
 
-    // check if this client has visited before (per-browser tracking)
-    const hasVisited = localStorage.getItem("hasVisited");
-    const fetchCount = () => {
-        fetch(`${baseURL}/getCount`, {
-            method: 'GET',
-            mode: 'cors',
-        })
-        .then(response => response.json())
-        .then(data => {
-            visitorCountElement.textContent = data.count.toString();
-        })
-        .catch(error => {
-            console.log("Error incrementing count: ", error);
-            visitorCountElement.textContent = 'Error...';
-        })
-    }
-    fetchCount();    // fetch the visitor count when the page first loaded
-    setInterval(fetchCount, 10000) // then fetch every 10 second to stay up-to-date
+    // Contact Form
+    setupContactForm(app);
 
-    // fetch initial count in the background
-    if (!hasVisited) {
-        fetch(`${baseURL}/incrementCount`, {
-            method: 'POST',
-            mode: 'cors',
-        })
-        .then(response => response.json())
-        .then(data => {
-            visitorCountElement.textContent = data.count.toString();
-            localStorage.setItem('hasVisited', 'true');     // Mark as visisted if it's this browser's first time visting.
-        })
-        .catch(error => {
-            console.log("Error incrementing count: ", error);
-            visitorCountElement.textContent = 'Error...';
-        })
-    }     
-    
     // Header
     const header = document.createElement('header');
     header.className = 'header';

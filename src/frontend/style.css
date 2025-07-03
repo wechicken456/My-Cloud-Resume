@@ -193,7 +193,25 @@ ul li::before {
     background: #fd9515; /* Red for Familiar */
 }
 
-/* -------------------------- COUNTER ---------------------------------------------- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* -------------------------------- COUNTERS ---------------------------------------------- */
 #visitor-counter-board {
     position: fixed;
     bottom: 20px;
@@ -221,6 +239,307 @@ ul li::before {
     color: #007bff;
     margin-top: 5px;
 }
+
+#likes-counter-board {
+    position: fixed;
+    bottom: 120px; /* Place above the visitor counter */
+    right: 20px;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#likes-counter-board button#like-btn {
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 0;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#likes-counter-board button#like-btn:hover {
+    background: transparent;
+    transform: scale(1.1);
+}
+
+#likes-counter-board #likes-count {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+    margin-top: 4px;
+}
+
+/* change the heart icon color when liked */
+#likes-counter-board button#like-btn svg {
+    transition: fill 0.3s ease, transform 0.2s ease;
+}
+
+#likes-counter-board button#like-btn:hover svg {
+    transform: scale(1.1);
+}
+
+#likes-counter-board button#like-btn:active svg {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* -------------------------- CONTACT FORM ------------------------------------- */
+
+#contact-form-board {
+    position: fixed;
+    bottom: 20px; /* Same level as visitor counter */
+    right: 140px; /* Position to the left of visitor counter */
+    background-color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    transition: all 0.3s ease;
+}
+
+#contact-form-board.expanded {
+    border-radius: 15px;
+    width: 400px;
+    height: 450px;
+    max-width: calc(100vw - 40px);
+    bottom: 20px; /* Keep same bottom position when expanded */
+}
+
+#contact-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+#contact-toggle-btn:hover {
+    transform: scale(1.05);
+    color: #2980b9;
+}
+
+#contact-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+#contact-form-container {
+    padding: 25px;
+    animation: slideIn 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#contact-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#contact-form-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#contact-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+#contact-close-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+#contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+}
+
+#contact-form input {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+#contact-form textarea {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 150px;
+    flex: 1;
+    transition: border-color 0.3s ease;
+}
+
+#contact-form input:focus,
+#contact-form textarea:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+}
+
+#contact-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#contact-form button[type="submit"] {
+    background: #2980b9;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+#contact-form button[type="submit"]:hover {
+    background: #3498db;
+}
+
+#contact-status {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #contact-form-board {
+        bottom: 20px;
+        right: 15px;
+    }
+    
+    #contact-form-board.expanded {
+        width: 320px;
+        height: 400px;
+        max-width: calc(100vw - 30px);
+    }
+    
+    #contact-toggle-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    #contact-form-container {
+        padding: 20px;
+    }
+    
+    #visitor-counter-board {
+        right: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    #contact-form-board {
+        bottom: 20px;
+        right: 10px;
+    }
+    
+    #contact-form-board.expanded {
+        width: 280px;
+        height: 350px;
+        max-width: calc(100vw - 20px);
+    }
+    
+    #contact-toggle-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    #contact-toggle-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    #visitor-counter-board {
+        right: 10px;
+    }
+}
+
+
+
+
+
 
 /* -------------------------- RESPONSIVE MEDIA ------------------------------------- */
 @media (max-width: 768px) {
