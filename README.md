@@ -92,7 +92,7 @@ aws cloudfront create-invalidation --distribution-id <your-cloudfront-id> --path
 
 [Here](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html#domain-register-procedure-section)
 
-I registered a domain called `pwnph0fun.com`.
+I registered a domain called `www.pwnph0fun.com`.
 ***IMPORTANT***: For Route 53 public and private DNS and health checks, the control plane is located in the us-east-1 AWS Region and the data planes are globally distributed.
 
 
@@ -204,7 +204,7 @@ GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o bootstrap main.go
 zip myFunction.zip bootstrap
 ```
 
-## Step 8 - Setup API Gateway
+## Step 8 - Setup API Gateway and its Custom Domain Name
 
 ### Substep 1 - Create the `/api` resource on API Gateway
 The `/api` prefix groups your endpoints, which is useful if you plan to add more API endpoints later (e.g., `/api/stats`, `/api/resetCount`). It keeps your API distinct from other potential resources (e.g., `/web`, `/admin`).
@@ -212,7 +212,8 @@ The `/api` prefix groups your endpoints, which is useful if you plan to add more
 Convention: Many REST APIs use `/api` as a standard prefix to indicate an API endpoint, improving readability and aligning with common practices.
 
 ### Substep 2 - Create the `/getCount` and `/incrementCount` resource on API Gateway
-
+- Click on the API endpoint resource.
+- Choose `ANY` method.
 - Choose the Lambda Integration option.
 - Enable the CORS option.
 - Enable Proxy Integration.
@@ -222,6 +223,29 @@ The `OPTIONS` resoruce lets browswer find out about CORS permissions:
 Browsers send an `OPTIONS` preflight request for `POST /putCount` (and potentially `GET /getCount` if headers change) to check CORS permissions. Your Lambda sets CORS headers (`Access-Control-Allow-Origin`: *), but API Gateway needs `OPTIONS` methods to respond to preflights.
 
 I edited the methods allowed in CORS to only `GET, POST, OPTIONS` since we only need `GET` for `getCount` and `POST` for `incrementCount`
+
+### Substep 3 - Deploy the API 
+
+Just click on **Deploy API** and set some stage name like `prod`.
+
+
+### Substep 3 - Create a custom domain name `api.pwnph0fun.com` for the API Gateway
+
+Right now, our API can be accessed using a link like this `https://<some-uuid>.execute-api.us-east-1.amazonaws.com/prod`. However, I want to use `https://api.pwnph0fun.com/prod` instead.
+
+1. On the left pane, click on **Custom domain names**.
+2. Create a record.
+3. Add a routing rule:
+    - Condition: any path matching `prod`. 
+    - Select our Target API and `prod` stage. 
+    - Strip base path => This way `prod` will be stripped away from the request handler of our Lambda.
+4. Add our cert for `*.pwnph0fun.com`
+5. Go to Route 53, click on **Hosted zones**.
+6. Create a new record for our subdomain `api`.
+7. Enable **Alias** and finish the rest.
+8. Wait around 2 minutes for the DNS records to update.
+
+
 
 
 ## Step 9 - Create Front-End code to fetch the APIs

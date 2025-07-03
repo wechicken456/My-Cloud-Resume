@@ -3,7 +3,7 @@ import { resumeData } from './data';
 import { api } from './api/api';
 import { setupLikesCounter } from './components/Likes';
 import { setupContactForm } from './components/Contact';
-import { setupVisitorCounter } from './components/Counter';
+import { setupVisitorCounter } from './components/Visitor';
 
 
 document.addEventListener('DOMContentLoaded', () => {

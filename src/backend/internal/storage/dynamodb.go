@@ -7,16 +7,26 @@ import (
 	"main/internal/model"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/aws/aws-sdk-go/aws"
 )
 
 type DynamoDBAPI interface {
 	GetItem(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error)
 	UpdateItem(ctx context.Context, params *dynamodb.UpdateItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.UpdateItemOutput, error)
 	PutItem(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error)
+}
+
+type StorageInterface interface {
+	GetCount(ctx context.Context, countName string) (int, error)
+	IncrementCount(ctx context.Context, countName string) (int, error)
+	DecrementCount(ctx context.Context, countName string) (int, error)
+	GetUserSession(ctx context.Context, sessionID string) (*model.UserSession, error)
+	CreateUserSession(ctx context.Context, sessionID string) error
+	UpdateUserSession(ctx context.Context, session *model.UserSession) error
 }
 
 type Storage struct {
@@ -46,13 +56,13 @@ func (s *Storage) GetSessionTable() string {
 }
 
 // retrieve count from DynamoDB and return json: {"count": ret} if successful
-func (s *Storage) GetCount(countName string) (int, error) {
+func (s *Storage) GetCount(ctx context.Context, countName string) (int, error) {
 	// required argument for UpdateItemInput
 	key := map[string]types.AttributeValue{
 		"ID": &types.AttributeValueMemberS{Value: countName}, // Value is the name of the ID that we set for the counter in DynamoDB
 	}
 
-	response, err := s.client.GetItem(context.Background(), &dynamodb.GetItemInput{TableName: &s.tableName, Key: key})
+	response, err := s.client.GetItem(ctx, &dynamodb.GetItemInput{TableName: &s.tableName, Key: key})
 	if err != nil {
 		return 0, err
 	}
@@ -74,7 +84,7 @@ func (s *Storage) GetCount(countName string) (int, error) {
 
 // use the DynamoDB client's UpdateItem() to increment the counter
 // return the new incremented count as json: {"count": ret} if successful
-func (s *Storage) IncrementCount(countName string) (int, error) {
+func (s *Storage) IncrementCount(ctx context.Context, countName string) (int, error) {
 
 	updateInput := dynamodb.UpdateItemInput{
 		TableName:                 &s.tableName,
@@ -84,7 +94,7 @@ func (s *Storage) IncrementCount(countName string) (int, error) {
 		ExpressionAttributeValues: map[string]types.AttributeValue{":val": &types.AttributeValueMemberN{Value: "1"}},
 		ReturnValues:              types.ReturnValueUpdatedNew, // Returns only the updated attributes, as they appear after theUpdateItem operation
 	}
-	result, err := s.client.UpdateItem(context.Background(), &updateInput)
+	result, err := s.client.UpdateItem(ctx, &updateInput)
 	if err != nil {
 		return 0, fmt.Errorf("failed to increment Count: %v", err)
 	}
@@ -97,7 +107,7 @@ func (s *Storage) IncrementCount(countName string) (int, error) {
 	return newCount, nil
 }
 
-func (s *Storage) DecrementCount(countName string) (int, error) {
+func (s *Storage) DecrementCount(ctx context.Context, countName string) (int, error) {
 	updateInput := dynamodb.UpdateItemInput{
 		TableName:                &s.tableName,
 		Key:                      map[string]types.AttributeValue{"ID": &types.AttributeValueMemberS{Value: countName}},
@@ -114,7 +124,7 @@ func (s *Storage) DecrementCount(countName string) (int, error) {
 	if err != nil {
 		// If condition fails (count would go negative), return current count
 		if err.Error() == "ConditionalCheckFailedException" {
-			return s.GetCount(countName)
+			return s.GetCount(ctx, countName)
 		}
 		return 0, fmt.Errorf("failed to decrement Count: %v", err)
 	}
@@ -180,14 +190,22 @@ func (s *Storage) CreateUserSession(ctx context.Context, sessionID string) error
 }
 
 func (s *Storage) UpdateUserSession(ctx context.Context, session *model.UserSession) error {
-	item, err := attributevalue.MarshalMap(session)
+	update := expression.Set(expression.Name("HasVisited"), expression.Value(session.HasVisited))
+	update.Set(expression.Name("HasLiked"), expression.Value(session.HasLiked))
+	update.Set(expression.Name("UpdatedAt"), expression.Value(time.Now()))
+	expr, err := expression.NewBuilder().WithUpdate(update).Build()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to build expression: %v", err)
 	}
 
-	_, err = s.client.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName: &s.sessionTable,
-		Item:      item,
+	_, err = s.client.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+		TableName:                 &s.sessionTable,
+		Key:                       map[string]types.AttributeValue{"SessionID": &types.AttributeValueMemberS{Value: session.SessionID}},
+		UpdateExpression:          expr.Update(),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+		ReturnValues:              types.ReturnValueUpdatedNew,
 	})
+
 	return err
 }

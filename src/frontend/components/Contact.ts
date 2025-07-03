@@ -1,7 +1,7 @@
 import { api } from '../api/api';
 import { getRecaptchaToken } from '../utils/recaptcha';
 
-const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
+const RECAPTCHA_SITE_KEY = '';
 
 export function setupContactForm(container: HTMLElement) {
     const contactDiv = document.createElement('div');
@@ -70,7 +70,6 @@ export function setupContactForm(container: HTMLElement) {
         const res = await api.sendContact(data);
         if (res.ok) {
             status.textContent = 'Sent!';
-            api.sendNotification('contact', { name: data.name, email: data.email });
             form.reset();
             setTimeout(() => {
                 toggleForm();

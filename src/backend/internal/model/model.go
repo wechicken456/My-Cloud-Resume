@@ -13,6 +13,7 @@ type UserSession struct {
 	HasLiked   bool      `dynamodbav:"HasLiked" json:"has_liked"`
 	ExpiresAt  time.Time `dynamodbav:"ExpiresAt" json:"expires_at"`
 	CreatedAt  time.Time `dynamodbav:"CreatedAt" json:"created_at"`
+	UpdatedAt  time.Time `dynamodbav:"UpdatedAt" json:"updated_at"`
 }
 
 type ContactRequest struct {

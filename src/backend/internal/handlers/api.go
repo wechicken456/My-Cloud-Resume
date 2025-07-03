@@ -17,25 +17,27 @@ import (
 )
 
 type APIHandler struct {
-	counterService      *service.CounterService
+	visitorService      *service.VisitorService
 	likesService        *service.LikesService
 	contactService      *service.ContactService
 	notificationService *service.NotificationService
 }
 
 func NewAPIHandler(
-	counterService *service.CounterService,
+	visitorService *service.VisitorService,
 	likesService *service.LikesService,
 	contactService *service.ContactService,
 	notificationService *service.NotificationService,
 ) *APIHandler {
 	return &APIHandler{
-		counterService:      counterService,
+		visitorService:      visitorService,
 		likesService:        likesService,
 		contactService:      contactService,
 		notificationService: notificationService,
 	}
 }
+
+var session_id_string string = "session_id"
 
 func (h *APIHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	headers := map[string]string{
@@ -65,12 +67,12 @@ func (h *APIHandler) HandleRequest(ctx context.Context, req events.APIGatewayPro
 	headers["Set-Cookie"] = sessionCookie
 
 	switch {
-	case req.HTTPMethod == "GET" && req.Resource == "/api/getCount":
-		return h.handleGetCount(ctx, headers)
-	case req.HTTPMethod == "POST" && req.Resource == "/api/incrementCount":
-		return h.handleIncrementCount(ctx, sessionID, headers)
-	case req.HTTPMethod == "GET" && req.Resource == "/api/getLikes":
-		return h.handleGetLikes(ctx, headers)
+	case req.HTTPMethod == "GET" && req.Resource == "/api/getVisitorCount":
+		return h.handleGetVisitorCount(ctx, headers)
+	case req.HTTPMethod == "POST" && req.Resource == "/api/incrementVisitorCount":
+		return h.handleIncrementVisitorCount(ctx, sessionID, headers)
+	case req.HTTPMethod == "GET" && req.Resource == "/api/getLikeCount":
+		return h.handleGetLikeCount(ctx, headers)
 	case req.HTTPMethod == "POST" && req.Resource == "/api/toggleLike":
 		return h.handleToggleLike(ctx, sessionID, headers)
 	case req.HTTPMethod == "POST" && req.Resource == "/api/contact":
@@ -78,6 +80,7 @@ func (h *APIHandler) HandleRequest(ctx context.Context, req events.APIGatewayPro
 	case req.HTTPMethod == "GET" && req.Resource == "/api/session":
 		return h.handleGetSession(ctx, sessionID, headers)
 	default:
+		headers["Set-Cookie"] = ""
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
 			Headers:    headers,
@@ -93,7 +96,7 @@ func (h *APIHandler) extractSessionID(cookieHeader string) string {
 
 	// Parse cookie header to extract session_id
 	cookies := parseCookies(cookieHeader)
-	return cookies["session_id"]
+	return cookies[session_id_string]
 }
 
 func parseCookies(cookieHeader string) map[string]string {
@@ -120,8 +123,8 @@ func generateSessionID() string {
 	return hex.EncodeToString(bytes)
 }
 
-func (h *APIHandler) handleGetCount(ctx context.Context, headers map[string]string) (events.APIGatewayProxyResponse, error) {
-	count, err := h.counterService.GetVisitorCount(ctx)
+func (h *APIHandler) handleGetVisitorCount(ctx context.Context, headers map[string]string) (events.APIGatewayProxyResponse, error) {
+	count, err := h.visitorService.GetVisitorCount(ctx)
 	if err != nil {
 		log.Printf("Error getting count: %v", err)
 		return h.errorResponse(500, "Database error", headers), nil
@@ -137,8 +140,8 @@ func (h *APIHandler) handleGetCount(ctx context.Context, headers map[string]stri
 	}, nil
 }
 
-func (h *APIHandler) handleIncrementCount(ctx context.Context, sessionID string, headers map[string]string) (events.APIGatewayProxyResponse, error) {
-	count, _, status, err := h.counterService.IncrementVisitorCount(ctx, sessionID)
+func (h *APIHandler) handleIncrementVisitorCount(ctx context.Context, sessionID string, headers map[string]string) (events.APIGatewayProxyResponse, error) {
+	count, _, status, err := h.visitorService.IncrementVisitorCount(ctx, sessionID)
 	if err != nil {
 		log.Printf("Error incrementing count: %v", err)
 		return h.errorResponse(500, "Database error", headers), nil
@@ -159,7 +162,7 @@ func (h *APIHandler) handleIncrementCount(ctx context.Context, sessionID string,
 	}, nil
 }
 
-func (h *APIHandler) handleGetLikes(ctx context.Context, headers map[string]string) (events.APIGatewayProxyResponse, error) {
+func (h *APIHandler) handleGetLikeCount(ctx context.Context, headers map[string]string) (events.APIGatewayProxyResponse, error) {
 	count, err := h.likesService.GetLikeCount(ctx)
 	if err != nil {
 		log.Printf("Error getting likes: %v", err)
@@ -177,7 +180,7 @@ func (h *APIHandler) handleGetLikes(ctx context.Context, headers map[string]stri
 }
 
 func (h *APIHandler) handleToggleLike(ctx context.Context, sessionID string, headers map[string]string) (events.APIGatewayProxyResponse, error) {
-	count, liked, action, err := h.likesService.ToggleLike(ctx, sessionID)
+	count, _, action, err := h.likesService.ToggleLike(ctx, sessionID)
 	if err != nil {
 		log.Printf("Error toggling like: %v", err)
 		return h.errorResponse(500, "Database error", headers), nil
@@ -198,9 +201,6 @@ func (h *APIHandler) handleToggleLike(ctx context.Context, sessionID string, hea
 		Count:   count,
 		Success: true,
 		Message: action,
-		Data: map[string]interface{}{
-			"liked": liked,
-		},
 	}
 
 	body, _ := json.Marshal(response)
@@ -213,7 +213,7 @@ func (h *APIHandler) handleToggleLike(ctx context.Context, sessionID string, hea
 }
 
 func (h *APIHandler) handleGetSession(ctx context.Context, sessionID string, headers map[string]string) (events.APIGatewayProxyResponse, error) {
-	session, err := h.counterService.GetSessionStatus(ctx, sessionID)
+	session, err := h.visitorService.GetSessionStatus(ctx, sessionID)
 	if err != nil {
 		log.Printf("Error getting session: %v", err)
 		return h.errorResponse(500, "Database error", headers), nil
@@ -222,9 +222,9 @@ func (h *APIHandler) handleGetSession(ctx context.Context, sessionID string, hea
 	response := model.APIResponse{
 		Success: true,
 		Data: map[string]interface{}{
-			"session_id":  sessionID,
-			"has_visited": session.HasVisited,
-			"has_liked":   session.HasLiked,
+			session_id_string: sessionID,
+			"visited":         session.HasVisited,
+			"liked":           session.HasLiked,
 		},
 	}
 
@@ -273,6 +273,7 @@ func (h *APIHandler) handleContact(ctx context.Context, body string, headers map
 }
 
 func (h *APIHandler) errorResponse(statusCode int, message string, headers map[string]string) events.APIGatewayProxyResponse {
+	headers["Set-Cookie"] = "" // Clear session cookie on error
 	response := model.APIResponse{Error: message, Success: false}
 	body, _ := json.Marshal(response)
 

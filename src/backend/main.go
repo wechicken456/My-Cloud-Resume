@@ -32,7 +32,7 @@ func main() {
 	store := storage.New(dynamoClient, appCfg.DynamoDBTable, appCfg.SessionTable)
 
 	// Initialize services
-	counterService := service.NewCounterService(store)
+	counterService := service.NewVisitorService(store)
 	likesService := service.NewLikesService(store)
 	contactService := service.NewContactService(appCfg)
 	notificationService := service.NewNotificationService(sesClient, snsClient, appCfg)

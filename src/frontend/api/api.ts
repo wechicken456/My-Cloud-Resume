@@ -1,10 +1,10 @@
-const baseURL = 'https://raf6u1lwte.execute-api.us-east-2.amazonaws.com/test/api';
+const baseURL = 'https://api.pwnph0fun.com/prod';
 const visitorCountElement = document.getElementById('visitor-count') as HTMLElement;
 
 export const api = {
 
-    async fetchCount() : Promise<string> {
-        const res = await fetch(`${baseURL}/getCount`, {
+    async fetchVisitorCount() : Promise<string> {
+        const res = await fetch(`${baseURL}/getVisitorCount`, {
             method: 'GET',
             mode: 'cors',
         })
@@ -16,8 +16,21 @@ export const api = {
         return res.count.toString();
     },
 
+    async incrementVisitorCount() : Promise<string> {
+        const res = await fetch(`${baseURL}/incrementVisitorCount`, {
+            method: 'POST',
+            mode: 'cors',
+        })
+        .then(response => response.json())
+        .catch(error => {
+            console.log("Error incremtinng visitor count: ", error);
+            return { count: 'Error' };
+        });
+        return res.count.toString();
+    },
+
     async fetchLikes() : Promise<string> {
-        const res = await fetch(`${baseURL}/getLikes`, {
+        const res = await fetch(`${baseURL}/getLikeCount`, {
             method: 'GET',
             mode: 'cors',
         })
@@ -29,26 +42,17 @@ export const api = {
         return res.count.toString();
     },
 
-    async incrementLikes() : Promise<string> {
-        const res = await fetch(`${baseURL}/incrementLikes`, {
+    async toggleLike() : Promise<string> {
+        const res = await fetch(`${baseURL}/toggleLike`, {
             method: 'POST',
             mode: 'cors',
         })
         .then(response => response.json())
         .catch(error => {
-            console.log("Error incrementing likes: ", error);
+            console.log("Error toggling likes: ", error);
             return { count: 'Error' };
         });
         return res.count.toString();
-    },
-
-    async sendNotification(type: 'like' | 'contact', payload: any) : Promise<void> {
-        await fetch(`${baseURL}/notify`, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type, ...payload }),
-        });
     },
 
     async sendContact(form: { name: string; email: string; message: string; recaptcha: string }) : Promise<Response> {

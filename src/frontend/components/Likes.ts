@@ -36,9 +36,8 @@ export function setupLikesCounter(container: HTMLElement) {
         isLiked = !isLiked;
         toggleLikeVisual();
 
-        const count = await api.incrementLikes();
+        const count = await api.toggleLike();
         likesCount.textContent = count;
-        api.sendNotification('like', {});
     };
 
     function updateLikes() {

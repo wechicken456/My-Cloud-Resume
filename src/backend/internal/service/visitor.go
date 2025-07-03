@@ -63,12 +63,12 @@ func (cs *VisitorService) GetSessionStatus(ctx context.Context, sessionID string
 	}
 
 	if session == nil {
-		// Return default session
-		return &model.UserSession{
-			SessionID:  sessionID,
-			HasVisited: false,
-			HasLiked:   false,
-		}, nil
+		// Create new session
+		err = cs.storage.CreateUserSession(ctx, sessionID)
+		if err != nil {
+			return nil, err
+		}
+		session = &model.UserSession{SessionID: sessionID, HasVisited: false, HasLiked: false}
 	}
 
 	return session, nil
