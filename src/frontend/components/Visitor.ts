@@ -1,8 +1,8 @@
-import { api, SessionStatus } from "../api/api";
+import { api } from "../api/api";
 
 class VisitorCounter {
     private counterBoard  : HTMLDivElement;
-    private visitorCountElement : HTMLElement;
+    private visitorCountElement !: HTMLElement;
     constructor() {
         // Visitor Counter
         this.counterBoard = document.createElement("div") as HTMLDivElement;

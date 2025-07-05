@@ -1,10 +1,10 @@
-import { api, SessionStatus } from '../api/api';
+import { api } from '../api/api';
 
 class LikeCounter {
     private likeDiv : HTMLDivElement;
-    private likeCountElement :  HTMLElement;
-    private likeBtn : HTMLButtonElement;  
-    private likeIcon : SVGElement;
+    private likeCountElement !:  HTMLElement;
+    private likeBtn !: HTMLButtonElement;  
+    private likeIcon !: SVGElement;
     private isLiked : boolean = false; // Default to not liked
     constructor() {
         this.likeDiv = document.createElement('div') as HTMLDivElement;
