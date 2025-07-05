@@ -29,14 +29,14 @@ jobs:
       - name: Setup Go 
         uses: actions/setup-go@v5
         with:
-          go-version: 1.22.2
+          go-version: 1.24.4
       
       - name: Install dependencies
         run: go mod tidy      
       - name: Build
         run: GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o bootstrap main.go
       - name: Run tests
-        run: go test -race -v *.go 
+        run: go test -race -v internal/service/*.go 
         if: always()
       - name: Zip for Lambda
         run: zip -j bootstrap.zip bootstrap
