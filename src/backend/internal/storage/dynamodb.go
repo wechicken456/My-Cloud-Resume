@@ -171,10 +171,11 @@ func (s *Storage) GetUserSession(ctx context.Context, sessionID string) (*model.
 func (s *Storage) CreateUserSession(ctx context.Context, sessionID string) error {
 	session := model.UserSession{
 		SessionID:  sessionID,
-		HasVisited: true,
+		HasVisited: false,
 		HasLiked:   false,
 		ExpiresAt:  time.Now().Add(24 * time.Hour),
 		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
 	item, err := attributevalue.MarshalMap(session)

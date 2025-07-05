@@ -32,13 +32,14 @@ func main() {
 	store := storage.New(dynamoClient, appCfg.DynamoDBTable, appCfg.SessionTable)
 
 	// Initialize services
-	counterService := service.NewVisitorService(store)
+	sessionService := service.NewSessionService(store)
+	visitorService := service.NewVisitorService(store)
 	likesService := service.NewLikesService(store)
 	contactService := service.NewContactService(appCfg)
 	notificationService := service.NewNotificationService(sesClient, snsClient, appCfg)
 
 	// Initialize handler
-	apiHandler := handlers.NewAPIHandler(counterService, likesService, contactService, notificationService)
+	apiHandler := handlers.NewAPIHandler(sessionService, visitorService, likesService, contactService, notificationService)
 
 	lambda.Start(apiHandler.HandleRequest)
 }
