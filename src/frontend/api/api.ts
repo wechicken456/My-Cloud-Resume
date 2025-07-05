@@ -1,7 +1,25 @@
-const baseURL = 'https://api.pwnph0fun.com/prod';
+const baseURL = 'https://api.pwnph0fun.com/prod/api';
 const visitorCountElement = document.getElementById('visitor-count') as HTMLElement;
 
+export interface SessionStatus {
+    has_visited: boolean;
+    has_liked: boolean;
+}
+
 export const api = {
+    async getSession(): Promise<SessionStatus> {
+        const res = await fetch(`${baseURL}/session`, {
+            method: 'GET',
+            mode: 'cors',
+            credentials: 'include',
+        })
+        .then(response => response.json())
+        .catch(error => {
+            console.log("Error fetching session: ", error);
+            throw error;
+        });
+        return res;
+    },
 
     async fetchVisitorCount() : Promise<string> {
         const res = await fetch(`${baseURL}/getVisitorCount`, {
@@ -20,10 +38,11 @@ export const api = {
         const res = await fetch(`${baseURL}/incrementVisitorCount`, {
             method: 'POST',
             mode: 'cors',
+            credentials: 'include',
         })
         .then(response => response.json())
         .catch(error => {
-            console.log("Error incremtinng visitor count: ", error);
+            console.log("Error incrementing visitor count: ", error);
             return { count: 'Error' };
         });
         return res.count.toString();
@@ -46,6 +65,7 @@ export const api = {
         const res = await fetch(`${baseURL}/toggleLike`, {
             method: 'POST',
             mode: 'cors',
+            credentials: 'include',
         })
         .then(response => response.json())
         .catch(error => {
@@ -59,8 +79,11 @@ export const api = {
         return fetch(`${baseURL}/contact`, {
             method: 'POST',
             mode: 'cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form),
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(form)
         });
     }
 }

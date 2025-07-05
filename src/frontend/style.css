@@ -240,7 +240,7 @@ ul li::before {
     margin-top: 5px;
 }
 
-#likes-counter-board {
+#like-counter-board {
     position: fixed;
     bottom: 120px; /* Place above the visitor counter */
     right: 20px;
@@ -260,7 +260,7 @@ ul li::before {
     justify-content: center;
 }
 
-#likes-counter-board button#like-btn {
+#like-counter-board button#like-btn {
     padding: 0;
     border: none;
     background: transparent;
@@ -274,12 +274,12 @@ ul li::before {
     justify-content: center;
 }
 
-#likes-counter-board button#like-btn:hover {
+#like-counter-board button#like-btn:hover {
     background: transparent;
     transform: scale(1.1);
 }
 
-#likes-counter-board #likes-count {
+#like-counter-board #like-count {
     font-weight: bold;
     color: #333;
     font-size: 16px;
@@ -287,15 +287,15 @@ ul li::before {
 }
 
 /* change the heart icon color when liked */
-#likes-counter-board button#like-btn svg {
+#like-counter-board button#like-btn svg {
     transition: fill 0.3s ease, transform 0.2s ease;
 }
 
-#likes-counter-board button#like-btn:hover svg {
+#like-counter-board button#like-btn:hover svg {
     transform: scale(1.1);
 }
 
-#likes-counter-board button#like-btn:active svg {
+#like-counter-board button#like-btn:active svg {
     transform: scale(0.95);
     transition: transform 0.1s ease;
 }
