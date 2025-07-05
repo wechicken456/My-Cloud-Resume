@@ -51,7 +51,7 @@ aws s3 cp ./dist s3://pwnph0fun-cloud-resume/ --recursive
 
 Then every time we change the front end, 
 Remember to **Invalidate** the CDN cache:
-```
+```bash
 aws cloudfront create-invalidation --distribution-id <your-cloudfront-id> --paths "/*"
 ```
 
@@ -351,4 +351,22 @@ jobs:
 
 
 
+
+## Step 12 - Added cookie for session tracking (July 2025)
+
+This is to make sure a user isn't counted as visited twice even if they close their browser and reopen it within 24 hours.
+
+Also, require a session cookie to be present in order to increase the like count. This prevents random users to just spam a script that increases the like count.
+
+
+For some reason, the `Cookie` header is converted to lowercase `cookie` in the Go request event:
+
+```go
+func (h *APIHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// Extract session ID from cookie
+	sessionID := h.extractSessionID(req.Headers["cookie"])
+	log.Printf("cookie: %v, Extracted session_id: %v", req.Headers["cookie"], sessionID)
+    ...
+}
+```
 
