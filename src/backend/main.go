@@ -34,7 +34,7 @@ func main() {
 	// Initialize services
 	sessionService := service.NewSessionService(store)
 	visitorService := service.NewVisitorService(store)
-	likesService := service.NewLikesService(store)
+	likesService := service.NewLikeService(store)
 	contactService := service.NewContactService(appCfg)
 	notificationService := service.NewNotificationService(sesClient, snsClient, appCfg)
 

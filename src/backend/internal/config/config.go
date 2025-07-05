@@ -25,7 +25,7 @@ func getEnv(key, defaultValue string) string {
 func Load() *Config {
 	return &Config{
 		DynamoDBTable:        getEnv("DYNAMODB_TABLE", "ResumeCounters"),
-		SessionTable:         getEnv("SESSION_TABLE", "UserSessions"),
+		SessionTable:         getEnv("SESSION_TABLE", "ResumeSessions"),
 		RecaptchaSecretKey:   getEnv("RECAPTCHA_SECRET_KEY", ""),
 		SESRegion:            getEnv("SES_REGION", "us-east-1"),
 		NotificationDstEmail: getEnv("NOTIFICATION_DST_EMAIL", "tinvuong2003@gmail.com"),

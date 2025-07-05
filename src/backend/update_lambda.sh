@@ -5,3 +5,4 @@ aws lambda update-function-code \
     --function-name Cloud-Resume-API-Handler-Lambda \
     --zip-file fileb://myFunction.zip \
     --region us-east-1
+rm myFunction.zip

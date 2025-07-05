@@ -17,7 +17,7 @@ import (
 type APIHandler struct {
 	sessionService      *service.SessionService
 	visitorService      *service.VisitorService
-	likesService        *service.LikesService
+	likesService        *service.LikeService
 	contactService      *service.ContactService
 	notificationService *service.NotificationService
 }
@@ -25,7 +25,7 @@ type APIHandler struct {
 func NewAPIHandler(
 	sessionService *service.SessionService,
 	visitorService *service.VisitorService,
-	likesService *service.LikesService,
+	likesService *service.LikeService,
 	contactService *service.ContactService,
 	notificationService *service.NotificationService,
 ) *APIHandler {
@@ -42,21 +42,22 @@ var sessionIDCookieName string = "session_id"
 
 func (h *APIHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Extract session ID from cookie
-	sessionID := h.extractSessionID(req.Headers["Cookie"])
+	sessionID := h.extractSessionID(req.Headers["cookie"])
+	log.Printf("cookie: %v, Extracted session_id: %v", req.Headers["cookie"], sessionID)
 
 	switch {
 	case req.Resource == "/api/session":
 		return h.handleGetSession(ctx, req, sessionID)
 	case req.Resource == "/api/getVisitorCount":
-		return h.handleGetVisitorCount(ctx, req, sessionID)
+		return h.handleGetVisitorCount(ctx, req)
 	case req.Resource == "/api/incrementVisitorCount":
 		return h.handleIncrementVisitorCount(ctx, req, sessionID)
 	case req.Resource == "/api/getLikeCount":
-		return h.handleGetLikeCount(ctx, req, sessionID)
+		return h.handleGetLikeCount(ctx, req)
 	case req.Resource == "/api/toggleLike":
 		return h.handleToggleLike(ctx, req, sessionID)
 	case req.Resource == "/api/contact":
-		return h.handleContact(ctx, req, sessionID)
+		return h.handleContact(ctx, req)
 	default:
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
@@ -70,8 +71,8 @@ func (h *APIHandler) handleGetSession(ctx context.Context, req events.APIGateway
 
 	headers["Content-Type"] = "application/json"
 	headers["Access-Control-Allow-Origin"] = "https://www.pwnph0fun.com"
-	headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-	headers["Access-Control-Allow-Headers"] = "Content-Type, Cookie"
+	headers["Access-Control-Allow-Methods"] = "GET,OPTIONS"
+	headers["Access-Control-Allow-Headers"] = "Content-Type,Cookie"
 	headers["Access-Control-Allow-Credentials"] = "true"
 
 	// Handle CORS preflight request
@@ -96,7 +97,6 @@ func (h *APIHandler) handleGetSession(ctx context.Context, req events.APIGateway
 	response := map[string]interface{}{
 		"has_visited": session.HasVisited,
 		"has_liked":   session.HasLiked,
-		"success":     true,
 	}
 
 	body, _ := json.Marshal(response)
@@ -113,13 +113,13 @@ func (h *APIHandler) handleGetSession(ctx context.Context, req events.APIGateway
 	}, nil
 }
 
-func (h *APIHandler) handleGetVisitorCount(ctx context.Context, req events.APIGatewayProxyRequest, sessionID string) (events.APIGatewayProxyResponse, error) {
+func (h *APIHandler) handleGetVisitorCount(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var headers map[string]string = map[string]string{}
 
 	headers["Content-Type"] = "application/json"
 	headers["Access-Control-Allow-Origin"] = "*"
-	headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-	headers["Access-Control-Allow-Headers"] = "Content-Type, Cookie"
+	headers["Access-Control-Allow-Methods"] = "GET,OPTIONS"
+	headers["Access-Control-Allow-Headers"] = "Content-Type,Cookie"
 	headers["Access-Control-Allow-Credentials"] = "true"
 
 	// Handle CORS preflight request
@@ -156,8 +156,8 @@ func (h *APIHandler) handleIncrementVisitorCount(ctx context.Context, req events
 
 	headers["Content-Type"] = "application/json"
 	headers["Access-Control-Allow-Origin"] = "https://www.pwnph0fun.com"
-	headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-	headers["Access-Control-Allow-Headers"] = "Content-Type, Cookie"
+	headers["Access-Control-Allow-Methods"] = "POST,OPTIONS"
+	headers["Access-Control-Allow-Headers"] = "Content-Type,Cookie"
 	headers["Access-Control-Allow-Credentials"] = "true"
 
 	// Handle CORS preflight request
@@ -215,13 +215,13 @@ func (h *APIHandler) handleIncrementVisitorCount(ctx context.Context, req events
 	}, nil
 }
 
-func (h *APIHandler) handleGetLikeCount(ctx context.Context, req events.APIGatewayProxyRequest, sessionID string) (events.APIGatewayProxyResponse, error) {
+func (h *APIHandler) handleGetLikeCount(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var headers map[string]string = map[string]string{}
 
 	headers["Content-Type"] = "application/json"
 	headers["Access-Control-Allow-Origin"] = "*"
-	headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-	headers["Access-Control-Allow-Headers"] = "Content-Type, Cookie"
+	headers["Access-Control-Allow-Methods"] = "GET,OPTIONS"
+	headers["Access-Control-Allow-Headers"] = "Content-Type,Cookie"
 	headers["Access-Control-Allow-Credentials"] = "true"
 
 	if req.HTTPMethod == "OPTIONS" {
@@ -257,8 +257,8 @@ func (h *APIHandler) handleToggleLike(ctx context.Context, req events.APIGateway
 
 	headers["Content-Type"] = "application/json"
 	headers["Access-Control-Allow-Origin"] = "https://www.pwnph0fun.com"
-	headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-	headers["Access-Control-Allow-Headers"] = "Content-Type, Cookie"
+	headers["Access-Control-Allow-Methods"] = "POST,OPTIONS"
+	headers["Access-Control-Allow-Headers"] = "Content-Type,Cookie"
 	headers["Access-Control-Allow-Credentials"] = "true"
 
 	// Handle CORS preflight request
@@ -324,13 +324,13 @@ func (h *APIHandler) handleToggleLike(ctx context.Context, req events.APIGateway
 	}, nil
 }
 
-func (h *APIHandler) handleContact(ctx context.Context, req events.APIGatewayProxyRequest, sessionID string) (events.APIGatewayProxyResponse, error) {
+func (h *APIHandler) handleContact(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var headers map[string]string = map[string]string{}
 
 	headers["Content-Type"] = "application/json"
 	headers["Access-Control-Allow-Origin"] = "https://www.pwnph0fun.com"
-	headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-	headers["Access-Control-Allow-Headers"] = "Content-Type, Cookie"
+	headers["Access-Control-Allow-Methods"] = "POST,OPTIONS"
+	headers["Access-Control-Allow-Headers"] = "Content-Type,Cookie"
 	headers["Access-Control-Allow-Credentials"] = "true"
 
 	// Handle CORS preflight request

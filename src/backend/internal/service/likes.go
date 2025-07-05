@@ -6,20 +6,20 @@ import (
 	"main/internal/storage"
 )
 
-type LikesService struct {
+type LikeService struct {
 	storage storage.StorageInterface
 }
 
-func NewLikesService(storage storage.StorageInterface) *LikesService {
-	return &LikesService{storage: storage}
+func NewLikeService(storage storage.StorageInterface) *LikeService {
+	return &LikeService{storage: storage}
 }
 
-func (ls *LikesService) GetLikeCount(ctx context.Context) (int, error) {
+func (ls *LikeService) GetLikeCount(ctx context.Context) (int, error) {
 	return ls.storage.GetCount(ctx, "likes")
 }
 
 // ToggleLike toggles the like status for a session and returns the updated count and action taken
-func (ls *LikesService) ToggleLike(ctx context.Context, session *model.UserSession) (int, string, error) {
+func (ls *LikeService) ToggleLike(ctx context.Context, session *model.UserSession) (int, string, error) {
 	var count int
 	var action string
 	var err error

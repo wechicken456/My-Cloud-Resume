@@ -59,7 +59,7 @@ func TestVisitorService_GetCount(t *testing.T) {
 		{
 			name: "successful get count",
 			mockSetup: func(m *MockStorage) {
-				m.On("GetCount", mock.Anything, "visitor").Return(42, nil)
+				m.On("GetCount", mock.Anything, "visitors").Return(42, nil)
 			},
 			expectedCount: 42,
 			expectedError: false,
@@ -67,7 +67,7 @@ func TestVisitorService_GetCount(t *testing.T) {
 		{
 			name: "storage error",
 			mockSetup: func(m *MockStorage) {
-				m.On("GetCount", mock.Anything, "visitor").Return(0, errors.New("storage error"))
+				m.On("GetCount", mock.Anything, "visitors").Return(0, errors.New("storage error"))
 			},
 			expectedCount: 0,
 			expectedError: true,
@@ -76,7 +76,7 @@ func TestVisitorService_GetCount(t *testing.T) {
 		{
 			name: "zero count",
 			mockSetup: func(m *MockStorage) {
-				m.On("GetCount", mock.Anything, "visitor").Return(0, nil)
+				m.On("GetCount", mock.Anything, "visitors").Return(0, nil)
 			},
 			expectedCount: 0,
 			expectedError: false,
@@ -106,86 +106,67 @@ func TestVisitorService_GetCount(t *testing.T) {
 
 func TestVisitorService_IncrementCount(t *testing.T) {
 	tests := []struct {
-		name                string
-		mockSetup           func(*MockStorage)
-		expectedCount       int
-		expectedIncremented bool
-		expectedAction      string
-		expectedError       bool
-		errorMessage        string
+		name           string
+		session        *model.UserSession
+		mockSetup      func(*MockStorage)
+		expectedCount  int
+		expectedAction string
+		expectedError  bool
+		errorMessage   string
 	}{
 		{
-			name: "successful increment",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "visitor").Return(&model.UserSession{SessionID: "visitor", HasVisited: false}, nil)
-				m.On("IncrementCount", mock.Anything, "visitor").Return(43, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(nil)
+			name: "successful increment - new visitors",
+			session: &model.UserSession{
+				SessionID:  "visitors",
+				HasVisited: false,
 			},
-			expectedCount:       43,
-			expectedIncremented: true,
-			expectedAction:      "incremented",
-			expectedError:       false,
+			mockSetup: func(m *MockStorage) {
+				m.On("IncrementCount", mock.Anything, "visitors").Return(43, nil)
+			},
+			expectedCount:  43,
+			expectedAction: "incremented",
+			expectedError:  false,
+		},
+		{
+			name: "already visited - return current count",
+			session: &model.UserSession{
+				SessionID:  "visitors",
+				HasVisited: true,
+			},
+			mockSetup: func(m *MockStorage) {
+				m.On("GetCount", mock.Anything, "visitors").Return(42, nil)
+			},
+			expectedCount:  42,
+			expectedAction: "already_visited",
+			expectedError:  false,
 		},
 		{
 			name: "storage error during increment",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "visitor").Return(nil, errors.New("session not found"))
-				m.On("IncrementCount", mock.Anything, "visitor").Return(0, errors.New("session not found"))
+			session: &model.UserSession{
+				SessionID:  "visitors",
+				HasVisited: false,
 			},
-			expectedCount:       0,
-			expectedIncremented: false,
-			expectedAction:      "",
-			expectedError:       true,
-			errorMessage:        "session not found",
+			mockSetup: func(m *MockStorage) {
+				m.On("IncrementCount", mock.Anything, "visitors").Return(0, errors.New("increment failed"))
+			},
+			expectedCount:  0,
+			expectedAction: "",
+			expectedError:  true,
+			errorMessage:   "increment failed",
 		},
 		{
-			name: "first increment",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "visitor").Return(&model.UserSession{SessionID: "visitor", HasVisited: false}, nil)
-				m.On("IncrementCount", mock.Anything, "visitor").Return(1, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(nil)
+			name: "storage error getting current count",
+			session: &model.UserSession{
+				SessionID:  "visitors",
+				HasVisited: true,
 			},
-			expectedCount:       1,
-			expectedIncremented: true,
-			expectedAction:      "incremented",
-			expectedError:       false,
-		},
-		{
-			name: "duplicate increment - already visited",
 			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "visitor").Return(&model.UserSession{SessionID: "visitor", HasVisited: true}, nil)
-				m.On("GetCount", mock.Anything, "visitor").Return(1, nil)
+				m.On("GetCount", mock.Anything, "visitors").Return(0, errors.New("get count failed"))
 			},
-			expectedCount:       1,
-			expectedIncremented: false,
-			expectedAction:      "already_counted",
-			expectedError:       false,
-		},
-		{
-			name: "session not found - create new session",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "visitor").Return(nil, nil)
-				m.On("CreateUserSession", mock.Anything, "visitor").Return(nil)
-				m.On("IncrementCount", mock.Anything, "visitor").Return(1, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(nil)
-			},
-			expectedCount:       1,
-			expectedIncremented: true,
-			expectedAction:      "incremented",
-			expectedError:       false,
-		},
-		{
-			name: "update session error",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "visitor").Return(&model.UserSession{SessionID: "visitor", HasVisited: false}, nil)
-				m.On("IncrementCount", mock.Anything, "visitor").Return(43, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(errors.New("update failed"))
-			},
-			expectedCount:       0,
-			expectedIncremented: false,
-			expectedAction:      "",
-			expectedError:       true,
-			errorMessage:        "update failed",
+			expectedCount:  0,
+			expectedAction: "already_visited",
+			expectedError:  true,
+			errorMessage:   "get count failed",
 		},
 	}
 
@@ -195,7 +176,7 @@ func TestVisitorService_IncrementCount(t *testing.T) {
 			tt.mockSetup(mockStorage)
 
 			service := NewVisitorService(mockStorage)
-			count, incremented, action, err := service.IncrementVisitorCount(context.Background(), "visitor")
+			count, action, err := service.IncrementVisitorCount(context.Background(), tt.session)
 
 			if tt.expectedError {
 				assert.Error(t, err)
@@ -203,14 +184,15 @@ func TestVisitorService_IncrementCount(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedCount, count)
-				assert.Equal(t, tt.expectedIncremented, incremented)
 				assert.Equal(t, tt.expectedAction, action)
 			}
+
+			mockStorage.AssertExpectations(t)
 		})
 	}
 }
 
-func TestLikesService_GetLikeCount(t *testing.T) {
+func TestLikeService_GetLikeCount(t *testing.T) {
 	tests := []struct {
 		name          string
 		mockSetup     func(*MockStorage)
@@ -250,7 +232,7 @@ func TestLikesService_GetLikeCount(t *testing.T) {
 			mockStorage := &MockStorage{}
 			tt.mockSetup(mockStorage)
 
-			service := NewLikesService(mockStorage)
+			service := NewLikeService(mockStorage)
 			count, err := service.GetLikeCount(context.Background())
 
 			if tt.expectedError {
@@ -266,10 +248,10 @@ func TestLikesService_GetLikeCount(t *testing.T) {
 	}
 }
 
-func TestLikesService_ToggleLike(t *testing.T) {
+func TestLikeService_ToggleLike(t *testing.T) {
 	tests := []struct {
 		name           string
-		sessionID      string
+		session        *model.UserSession
 		mockSetup      func(*MockStorage)
 		expectedCount  int
 		expectedLiked  bool
@@ -278,12 +260,13 @@ func TestLikesService_ToggleLike(t *testing.T) {
 		errorMessage   string
 	}{
 		{
-			name:      "successful like - first time",
-			sessionID: "test-session",
+			name: "successful like - first time",
+			session: &model.UserSession{
+				SessionID: "test-session",
+				HasLiked:  false,
+			},
 			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "test-session").Return(&model.UserSession{SessionID: "test-session", HasLiked: false}, nil)
 				m.On("IncrementCount", mock.Anything, "likes").Return(26, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(nil)
 			},
 			expectedCount:  26,
 			expectedLiked:  true,
@@ -291,12 +274,13 @@ func TestLikesService_ToggleLike(t *testing.T) {
 			expectedError:  false,
 		},
 		{
-			name:      "successful unlike - toggle off",
-			sessionID: "test-session",
+			name: "successful unlike - toggle off",
+			session: &model.UserSession{
+				SessionID: "test-session",
+				HasLiked:  true,
+			},
 			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "test-session").Return(&model.UserSession{SessionID: "test-session", HasLiked: true}, nil)
 				m.On("DecrementCount", mock.Anything, "likes").Return(24, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(nil)
 			},
 			expectedCount:  24,
 			expectedLiked:  false,
@@ -304,49 +288,12 @@ func TestLikesService_ToggleLike(t *testing.T) {
 			expectedError:  false,
 		},
 		{
-			name:      "session not found - create new session and like",
-			sessionID: "new-session",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "new-session").Return(nil, nil)
-				m.On("CreateUserSession", mock.Anything, "new-session").Return(nil)
-				m.On("IncrementCount", mock.Anything, "likes").Return(1, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(nil)
+			name: "storage error during increment",
+			session: &model.UserSession{
+				SessionID: "test-session",
+				HasLiked:  false,
 			},
-			expectedCount:  1,
-			expectedLiked:  true,
-			expectedAction: "liked",
-			expectedError:  false,
-		},
-		{
-			name:      "storage error getting session",
-			sessionID: "test-session",
 			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "test-session").Return(nil, errors.New("session error"))
-			},
-			expectedCount:  0,
-			expectedLiked:  false,
-			expectedAction: "",
-			expectedError:  true,
-			errorMessage:   "session error",
-		},
-		{
-			name:      "storage error creating session",
-			sessionID: "new-session",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "new-session").Return(nil, nil)
-				m.On("CreateUserSession", mock.Anything, "new-session").Return(errors.New("create failed"))
-			},
-			expectedCount:  0,
-			expectedLiked:  false,
-			expectedAction: "",
-			expectedError:  true,
-			errorMessage:   "create failed",
-		},
-		{
-			name:      "storage error during increment",
-			sessionID: "test-session",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "test-session").Return(&model.UserSession{SessionID: "test-session", HasLiked: false}, nil)
 				m.On("IncrementCount", mock.Anything, "likes").Return(0, errors.New("increment failed"))
 			},
 			expectedCount:  0,
@@ -356,10 +303,12 @@ func TestLikesService_ToggleLike(t *testing.T) {
 			errorMessage:   "increment failed",
 		},
 		{
-			name:      "storage error during decrement",
-			sessionID: "test-session",
+			name: "storage error during decrement",
+			session: &model.UserSession{
+				SessionID: "test-session",
+				HasLiked:  true,
+			},
 			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "test-session").Return(&model.UserSession{SessionID: "test-session", HasLiked: true}, nil)
 				m.On("DecrementCount", mock.Anything, "likes").Return(0, errors.New("decrement failed"))
 			},
 			expectedCount:  0,
@@ -368,20 +317,6 @@ func TestLikesService_ToggleLike(t *testing.T) {
 			expectedError:  true,
 			errorMessage:   "decrement failed",
 		},
-		{
-			name:      "storage error updating session",
-			sessionID: "test-session",
-			mockSetup: func(m *MockStorage) {
-				m.On("GetUserSession", mock.Anything, "test-session").Return(&model.UserSession{SessionID: "test-session", HasLiked: false}, nil)
-				m.On("IncrementCount", mock.Anything, "likes").Return(26, nil)
-				m.On("UpdateUserSession", mock.Anything, mock.AnythingOfType("*model.UserSession")).Return(errors.New("update failed"))
-			},
-			expectedCount:  26,
-			expectedLiked:  true,
-			expectedAction: "liked",
-			expectedError:  true,
-			errorMessage:   "update failed",
-		},
 	}
 
 	for _, tt := range tests {
@@ -389,8 +324,8 @@ func TestLikesService_ToggleLike(t *testing.T) {
 			mockStorage := &MockStorage{}
 			tt.mockSetup(mockStorage)
 
-			service := NewLikesService(mockStorage)
-			count, liked, action, err := service.ToggleLike(context.Background(), tt.sessionID)
+			service := NewLikeService(mockStorage)
+			count, action, err := service.ToggleLike(context.Background(), tt.session)
 
 			if tt.expectedError {
 				assert.Error(t, err)
@@ -398,8 +333,9 @@ func TestLikesService_ToggleLike(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedCount, count)
-				assert.Equal(t, tt.expectedLiked, liked)
 				assert.Equal(t, tt.expectedAction, action)
+				// Check that the session's HasLiked field was updated correctly
+				assert.Equal(t, tt.expectedLiked, tt.session.HasLiked)
 			}
 
 			mockStorage.AssertExpectations(t)
