@@ -364,8 +364,7 @@ func (h *APIHandler) handleContact(ctx context.Context, req events.APIGatewayPro
 			"email":   contactReq.Email,
 			"message": contactReq.Message,
 		},
-		Source:    "resume-website",
-		Timestamp: contactReq.Timestamp,
+		Source: "resume-website",
 	}
 	go h.notificationService.SendEmailNotification(context.Background(), payload)
 	go h.notificationService.SendSMSNotification(context.Background(), payload)

@@ -1,7 +1,7 @@
 import { api } from '../api/api';
 import { getRecaptchaToken } from '../utils/recaptcha';
 
-const RECAPTCHA_SITE_KEY = '';
+const RECAPTCHA_SITE_KEY = '6LeKHXorAAAAAKEb3mnixv6VTJDHjMgNoFnz1ksy';
 
 export function setupContactForm(container: HTMLElement) {
     const contactDiv = document.createElement('div');
@@ -65,7 +65,7 @@ export function setupContactForm(container: HTMLElement) {
             name: formData.get('name') as string,
             email: formData.get('email') as string,
             message: formData.get('message') as string,
-            recaptcha: await getRecaptchaToken(RECAPTCHA_SITE_KEY)
+            recaptcha: await getRecaptchaToken(RECAPTCHA_SITE_KEY),
         };
         const res = await api.sendContact(data);
         if (res.ok) {

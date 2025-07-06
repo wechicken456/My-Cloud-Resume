@@ -24,12 +24,12 @@ func getEnv(key, defaultValue string) string {
 
 func Load() *Config {
 	return &Config{
-		DynamoDBTable:        getEnv("DYNAMODB_TABLE", "ResumeCounters"),
-		SessionTable:         getEnv("SESSION_TABLE", "ResumeSessions"),
+		DynamoDBTable:        getEnv("COUNTERS_TABLE", ""),
+		SessionTable:         getEnv("SESSION_TABLE", ""),
 		RecaptchaSecretKey:   getEnv("RECAPTCHA_SECRET_KEY", ""),
-		SESRegion:            getEnv("SES_REGION", "us-east-1"),
+		SESRegion:            getEnv("SES_REGION", ""),
 		NotificationDstEmail: getEnv("NOTIFICATION_DST_EMAIL", "tinvuong2003@gmail.com"),
-		NotificationSrcEmail: getEnv("NOTIFICATION_SRC_EMAIL", "tuztheultimatezed@gmail.com"),
+		NotificationSrcEmail: getEnv("NOTIFICATION_SRC_EMAIL", ""),
 
 		NotificationPhoneNumber: getEnv("NOTIFICATION_DST_PHONE", "5139148401"),
 		Environment:             getEnv("ENVIRONMENT", "dev"),
