@@ -1,14 +1,14 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"main/internal/config"
 	"main/internal/model"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 type ContactService struct {
@@ -21,16 +21,11 @@ func NewContactService(cfg *config.Config) *ContactService {
 
 func (cs *ContactService) verifyRecaptcha(token string) (bool, error) {
 	const verifyURL = "https://www.google.com/recaptcha/api/siteverify"
-	data := map[string]string{
-		"secret":   cs.config.RecaptchaSecretKey,
-		"response": token,
-	}
-	payload, err := json.Marshal(data)
-	if err != nil {
-		return false, err
-	}
+	data := url.Values{}
+	data.Set("secret", cs.config.RecaptchaSecretKey)
+	data.Set("response", token)
 
-	res, err := http.Post(verifyURL, "application/json", bytes.NewBuffer(payload))
+	res, err := http.Post(verifyURL, "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
 	if err != nil {
 		return false, fmt.Errorf("failed reCAPTCHA API request: %v", err)
 	}
@@ -54,7 +49,7 @@ func (cs *ContactService) ProcessContactRequest(ctx context.Context, contactReq 
 		return err
 	}
 	if !good {
-		return errors.New("failed reCAPTCHA")
+		return fmt.Errorf("failed reCAPTCHA: %v", err)
 	}
 	return nil
 }

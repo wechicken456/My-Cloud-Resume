@@ -42,7 +42,6 @@ var sessionIDCookieName string = "session_id"
 func (h *APIHandler) HandleRequest(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Extract session ID from cookie
 	sessionID := h.extractSessionID(req.Headers["cookie"])
-	log.Printf("cookie: %v, Extracted session_id: %v", req.Headers["cookie"], sessionID)
 
 	switch req.Resource {
 	case "/api/session":
@@ -353,7 +352,7 @@ func (h *APIHandler) handleContact(ctx context.Context, req events.APIGatewayPro
 
 	if err := h.contactService.ProcessContactRequest(ctx, &contactReq); err != nil {
 		log.Printf("Error processing contact request: %v", err)
-		return h.errorResponse(400, "Invalid request", headers), nil
+		return h.errorResponse(400, fmt.Sprintf("Invalid request %v", err), headers), nil
 	}
 
 	// Send notification

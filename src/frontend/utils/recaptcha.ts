@@ -4,7 +4,11 @@ export function loadRecaptcha(siteKey: string) {
         const script = document.createElement('script');
         script.id = 'recaptcha-script';
         script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
-        script.onload = () => resolve();
+        script.onload = () => {
+            // Wait for grecaptcha to be ready after script loads
+            // @ts-ignore
+            grecaptcha.ready(() => resolve());
+        };
         document.head.appendChild(script);
     });
 }
