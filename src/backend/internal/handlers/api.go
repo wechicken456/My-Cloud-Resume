@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strings"
-	"time"
-
 	"main/internal/model"
 	"main/internal/service"
+	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -45,18 +44,18 @@ func (h *APIHandler) HandleRequest(ctx context.Context, req events.APIGatewayPro
 	sessionID := h.extractSessionID(req.Headers["cookie"])
 	log.Printf("cookie: %v, Extracted session_id: %v", req.Headers["cookie"], sessionID)
 
-	switch {
-	case req.Resource == "/api/session":
+	switch req.Resource {
+	case "/api/session":
 		return h.handleGetSession(ctx, req, sessionID)
-	case req.Resource == "/api/getVisitorCount":
+	case "/api/getVisitorCount":
 		return h.handleGetVisitorCount(ctx, req)
-	case req.Resource == "/api/incrementVisitorCount":
+	case "/api/incrementVisitorCount":
 		return h.handleIncrementVisitorCount(ctx, req, sessionID)
-	case req.Resource == "/api/getLikeCount":
+	case "/api/getLikeCount":
 		return h.handleGetLikeCount(ctx, req)
-	case req.Resource == "/api/toggleLike":
+	case "/api/toggleLike":
 		return h.handleToggleLike(ctx, req, sessionID)
-	case req.Resource == "/api/contact":
+	case "/api/contact":
 		return h.handleContact(ctx, req)
 	default:
 		return events.APIGatewayProxyResponse{
@@ -94,7 +93,7 @@ func (h *APIHandler) handleGetSession(ctx context.Context, req events.APIGateway
 		return h.errorResponse(500, "Session error", headers), nil
 	}
 
-	response := map[string]interface{}{
+	response := map[string]any{
 		"has_visited": session.HasVisited,
 		"has_liked":   session.HasLiked,
 	}
@@ -302,7 +301,7 @@ func (h *APIHandler) handleToggleLike(ctx context.Context, req events.APIGateway
 	if action == "liked" {
 		payload := &model.NotificationPayload{
 			Type:      "like",
-			Data:      map[string]interface{}{},
+			Data:      map[string]any{},
 			Source:    "resume-website",
 			Timestamp: time.Now(),
 		}
@@ -360,7 +359,7 @@ func (h *APIHandler) handleContact(ctx context.Context, req events.APIGatewayPro
 	// Send notification
 	payload := &model.NotificationPayload{
 		Type: "contact",
-		Data: map[string]interface{}{
+		Data: map[string]any{
 			"name":    contactReq.Name,
 			"email":   contactReq.Email,
 			"message": contactReq.Message,
@@ -396,8 +395,8 @@ func parseCookies(cookieHeader string) map[string]string {
 		return cookies
 	}
 
-	parts := strings.Split(cookieHeader, ";")
-	for _, part := range parts {
+	parts := strings.SplitSeq(cookieHeader, ";")
+	for part := range parts {
 		part = strings.TrimSpace(part)
 		if eq := strings.Index(part, "="); eq >= 0 {
 			key := strings.TrimSpace(part[:eq])
