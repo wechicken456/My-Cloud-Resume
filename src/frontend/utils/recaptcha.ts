@@ -12,5 +12,5 @@ export function loadRecaptcha(siteKey: string) {
 export async function getRecaptchaToken(siteKey: string) {
     await loadRecaptcha(siteKey);
     // @ts-ignore
-    return window.grecaptcha.execute(siteKey, { action: 'contact' });
+    return grecaptcha.execute(siteKey, { action: 'contact' });
 }
