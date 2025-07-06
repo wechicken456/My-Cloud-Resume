@@ -1,23 +1,56 @@
 # Cloud Resume
 
+**TODO**: integrate Google reCAPTCHA for contact form submission.
+
 You can access my domain and resume [here](https://www.pwnph0fun.com).
 
 
 ## Project structure
 
 ```
-./
-|-- public/
-│   |- index.html
-|-- src/
-│   |- data/
-│   │   |- resumeData.ts
-│   |- main.ts
-│   |- style.css
-|-- package.json
-|-- tsconfig.json
-|-- vite.config.ts
-|-- tailwind.config.js
+├── index.html                              # Entry point for the frontend, links the main TypeScript file and renders the app.
+├── package.json              
+├── package-lock.json        
+├── README.md                               # Documentation for the project, including setup instructions and deployment steps.
+├── src                       
+│   ├── backend                             # Backend implementation in Go, handles API logic and AWS integrations.
+│   │   ├── cmd               
+│   │   ├── go.mod           
+│   │   ├── go.sum            
+│   │   ├── internal                        # Contains core backend logic, organized into subdirectories.
+│   │   │   ├── config       
+│   │   │   │   └── config.go 
+│   │   │   ├── handlers                    # API request handlers for routing and processing HTTP requests.
+│   │   │   │   └── api.go    
+│   │   │   ├── model                       # Data models and structures used across the backend.
+│   │   │   │   └── model.go  
+│   │   │   ├── service                     # Business logic layer, implements core functionality.
+│   │   │   │   ├── contact.go              
+│   │   │   │   ├── likes.go                
+│   │   │   │   ├── notification.go        
+│   │   │   │   ├── session.go              
+│   │   │   │   ├── visitor.go              
+│   │   │   │   └── visitor_likes_test.go   # Unit tests for visitor and like services.
+│   │   │   └── storage                     # Data access layer, interacts with DynamoDB.
+│   │   │       ├── dynamodb.go       
+│   │   │       └── dynamodb_test.go  
+│   │   ├── main.go                         # Entry point for the backend, initializes services and starts the Lambda handler.
+│   │   └── update_lambda.sh                # Script to build, package, and deploy the Lambda function to AWS.
+│   └── frontend                            # Frontend implementation in TypeScript, styled with CSS.
+│       ├── api                             # API client for interacting with the backend.
+│       │   └── api.ts         
+│       ├── components                      # Modular UI components for the frontend.
+│       │   ├── Contact.ts     
+│       │   ├── Likes.ts       
+│       │   └── Visitor.ts     
+│       ├── data.ts                         # Contains static data for the resume (e.g., education, experience, skills).
+│       ├── main.ts                         # Main entry point for the frontend, initializes the app and renders components.
+│       ├── style.css          
+│       ├── utils                           # Utility functions for the frontend.
+│       │   └── recaptcha.ts                # Helper functions to load and interact with Google reCAPTCHA.
+│       └── vite-env.d.ts     
+├── tsconfig.json              
+└── vite.config.ts             
 ```
 
 ## Step 1 - HTML, CSS, Typescript
