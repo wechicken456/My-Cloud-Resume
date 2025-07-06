@@ -11,20 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     visitorCounter.setupVisitorCounter(app);
     likeCounter.setupLikeCounter(app);
 
-    // Check if this user has visited or liked before
-    api.getSession().then(sessionStatus => {
-        // Update visitor and like counters based on this user's session
-        visitorCounter.updateVisitorSessionStatus(sessionStatus.has_visited);
-        likeCounter.updateLikeSessionStatus(sessionStatus.has_liked);
-    }).catch(error => {
-        console.error('Failed to fetch session status:', error);
-        // Fallback: assume first-time visitor and not liked
-        visitorCounter.updateVisitorSessionStatus(false);
-        likeCounter.updateLikeSessionStatus(false);
-    });
-    setupContactForm(app);
-
-
     // Header
     const header = document.createElement('header');
     header.className = 'header';
@@ -139,4 +125,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
     `;
     app.appendChild(skillsSection);
+
+
+    // Session handling
+    // Check if this user has visited or liked before
+    api.getSession().then(sessionStatus => {
+        // Update visitor and like counters based on this user's session
+        visitorCounter.updateVisitorSessionStatus(sessionStatus.has_visited);
+        likeCounter.updateLikeSessionStatus(sessionStatus.has_liked);
+    }).catch(error => {
+        console.error('Failed to fetch session status:', error);
+        // Fallback: assume first-time visitor and not liked
+        visitorCounter.updateVisitorSessionStatus(false);
+        likeCounter.updateLikeSessionStatus(false);
+    });
+    setupContactForm(app);
 });
