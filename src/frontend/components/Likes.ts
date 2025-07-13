@@ -1,11 +1,11 @@
 import { api } from '../api/api';
 
 class LikeCounter {
-    private likeDiv : HTMLDivElement;
-    private likeCountElement !:  HTMLElement;
-    private likeBtn !: HTMLButtonElement;  
+    private likeDiv: HTMLDivElement;
+    private likeCountElement !: HTMLElement;
+    private likeBtn !: HTMLButtonElement;
     private likeIcon !: SVGElement;
-    private isLiked : boolean = false; // Default to not liked
+    private isLiked: boolean = false; // Default to not liked
     constructor() {
         this.likeDiv = document.createElement('div') as HTMLDivElement;
         this.likeDiv.id = 'like-counter-board';
@@ -36,10 +36,10 @@ class LikeCounter {
         container.appendChild(this.likeDiv);
 
         this.likeCountElement = this.likeDiv.querySelector('#like-count') as HTMLElement;
-        this.likeBtn = this.likeDiv.querySelector('#like-btn') as HTMLButtonElement;  
+        this.likeBtn = this.likeDiv.querySelector('#like-btn') as HTMLButtonElement;
         this.likeIcon = this.likeDiv.querySelector('#like-icon') as SVGElement;
-            
-        // Initialize visual state based on session
+
+        // Initialize visual state as empty 
         this.toggleLikeVisual();
 
         this.likeBtn.onclick = async () => {
@@ -72,9 +72,11 @@ class LikeCounter {
 
     // only called once after the page has loaded
     updateLikeSessionStatus(has_liked: boolean) {
-        // If the user has liked, update the visual state   
-        if (this.isLiked != has_liked) this.toggleLikeVisual();
-        this.isLiked = has_liked;
+        // If the user has liked, update the visual state
+        if (this.isLiked != has_liked) {
+            this.isLiked = has_liked;
+            this.toggleLikeVisual();
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 import { api } from "../api/api";
 
 class VisitorCounter {
-    private counterBoard  : HTMLDivElement;
+    private counterBoard: HTMLDivElement;
     private visitorCountElement !: HTMLElement;
     constructor() {
         // Visitor Counter
@@ -18,7 +18,7 @@ class VisitorCounter {
 
         this.visitorCountElement = document.getElementById('visitor-count') as HTMLElement;
 
-        
+
 
         // Initialize with current count
         this.updateVisitorCount();
@@ -43,7 +43,7 @@ class VisitorCounter {
 
     updateVisitorSessionStatus(has_visited: boolean) {
         // If this is a first-time visitor, increment the count
-        if (has_visited) {
+        if (!has_visited) {
             api.incrementVisitorCount().then(count => {
                 if (this.visitorCountElement) this.visitorCountElement.textContent = count;
             });
