@@ -158,6 +158,13 @@ export const resumeData: ResumeData = {
             ]
         },
         {
+            name: "Memory Card Game in React",
+            date: "August 2024",
+            details: [
+                "Built an interactive memory card game in React featuring component-based architecture, state management with hooks, and responsive UI with SCSS styling and Framer Motion animations."
+            ]
+        },
+        {
             name: "Security Exploit Challenge",
             date: "December 2023",
             details: [
@@ -198,6 +205,8 @@ export const resumeData: ResumeData = {
         { name: "sqlc", proficiency: "experienced" },
         { name: "Express", proficiency: "familiar" },
         { name: "React", proficiency: "experienced" },
+        { name: "Svelte", proficiency: "experienced" },
+        { name: "Flask", proficiency: "familiar" },
         { name: "Pytorch", proficiency: "experienced" },
         { name: "Git", proficiency: "proficient" },
         { name: "Ghidra", proficiency: "proficient" },
