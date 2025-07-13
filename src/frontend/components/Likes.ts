@@ -38,9 +38,9 @@ class LikeCounter {
         this.likeCountElement = this.likeDiv.querySelector('#like-count') as HTMLElement;
         this.likeBtn = this.likeDiv.querySelector('#like-btn') as HTMLButtonElement;
         this.likeIcon = this.likeDiv.querySelector('#like-icon') as SVGElement;
-
-        // Initialize visual state as empty 
-        this.toggleLikeVisual();
+        // Initialize visual state as empty heart 
+        this.likeIcon.setAttribute('fill', 'none');
+        this.likeIcon.setAttribute('stroke', '#e74c3c');
 
         this.likeBtn.onclick = async () => {
             // Toggle like state and update visual

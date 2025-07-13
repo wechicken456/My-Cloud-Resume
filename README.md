@@ -1,8 +1,10 @@
 # Cloud Resume
 
-**TODO**: integrate Google reCAPTCHA for contact form submission.
 
-You can access my domain and resume [here](https://www.pwnph0fun.com).
+You can access my domain and resume [here](https://www.pwnph0fun.com). 
+
+If you wish to contact me via email, please submit a contact form at the bottom right corner of my resume page :)
+
 
 
 ## Project structure
