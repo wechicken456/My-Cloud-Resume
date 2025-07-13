@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"log"
 	"main/internal/config"
 	"main/internal/model"
 	"time"
@@ -112,7 +111,6 @@ Your Cloud Resume Lambda
 		return fmt.Errorf("failed to send SES email: %w", err)
 	}
 
-	log.Printf("SES email notification for sent: %v", subject)
 	return nil
 }
 

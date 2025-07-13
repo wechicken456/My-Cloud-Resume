@@ -304,7 +304,10 @@ func (h *APIHandler) handleToggleLike(ctx context.Context, req events.APIGateway
 			Source:    "resume-website",
 			Timestamp: time.Now(),
 		}
-		go h.notificationService.SendEmailNotification(context.Background(), payload)
+		err = h.notificationService.SendEmailNotification(context.Background(), payload)
+		if err != nil {
+			log.Printf("notificationService: %v", err)
+		}
 	}
 
 	response := model.APIResponse{
